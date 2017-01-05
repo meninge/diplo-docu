@@ -1,0 +1,57 @@
+ 
+\documentclass[A4]{article}
+
+% -- Packages --
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fancyhdr}
+\usepackage{color}
+\usepackage[english]{babel}
+\usepackage{cite}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{a4}
+\usepackage[a4paper, total={5.5in, 9in}]{geometry}
+% -- inserer des pdf
+\usepackage{pdfpages}
+% -- Pour wrapfig = Pour gerer les image + text
+\usepackage{wrapfig}
+% -- Pour les indentations au 1er paragraph
+\usepackage{indentfirst}
+% -- Pour quelques truc de math 
+\usepackage{amsmath}
+\usepackage{SIunits}
+% -- For the biblio in the table of content 
+\usepackage[nottoc]{tocbibind}
+% -- for apendix
+\usepackage[toc,page]{appendix}
+% -- for the nomenclature
+\usepackage{nomencl}
+\makenomenclature
+\renewcommand{\nomname}{List of Symbols}
+
+% -- Config --
+\pagestyle{fancy}
+
+% -- Document --
+
+\begin{document}
+
+   % -- Page de garde :
+   
+\begin{figure}[h!]
+    \centering
+    %\includepdf[pages={1}]{data/FirstPage.pdf}
+    \label{fig:first}
+\end{figure}
+   
+\pagebreak
+\tableofcontents
+
+% -- Sections --
+\pagebreak
+\input{structure.tex}
+
+\end{document}
+
