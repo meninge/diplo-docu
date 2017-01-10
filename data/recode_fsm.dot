@@ -1,0 +1,17 @@
+digraph finite_state_machine {
+	rankdir=LR;
+	size="8,5"
+	node [shape = circle];
+	RESET -> RESET [ label = "" ];
+	RESET -> DATA [ label = "write_mode=0 && data_valid=1" ];
+	RESET -> WRITE_INPUT [ label = "write_mode=1 && write_enable=1" ];
+	WRITE_INPUT -> WRITE_INPUT [ label = "addr<FSIZE-1 && write_enable=1" ];
+	WRITE_INPUT -> WRITE_WAIT [ label = " addr<FSIZE-1 && write_enable=0" ];
+	WRITE_INPUT -> RESET [ label = "addr=FSIZE-1" ];
+	WRITE_WAIT -> WRITE_INPUT [ label = "write_enable=1" ];
+	WRITE_WAIT -> WRITE_WAIT [ label = "write_enable=0" ];
+	DATA -> RESET [ label = "fifo_out_room>0 && data_in_valid=1 && addr=FSIZE-1" ];
+	DATA -> DATA [ label = "fifo_out_room>0 && data_in_valid=1 && addr<FSIZE-1" ];
+	DATA -> DATA [ label = "fifo_out_room=0 || data_in_valid=0" ];
+}
+

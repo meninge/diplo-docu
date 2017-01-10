@@ -1,0 +1,31 @@
+digraph finite_state_machine {
+	rankdir=LR;
+	size="8,5"
+	node [shape = circle];
+	RESET_STATE -> MODE_FSM [ label = "" ];
+	MODE_FSM -> MODE_ACC [ label = "fsm_mode=0" ];
+	MODE_FSM -> MODE_WEIGHT [ label = "fsm_mode=1" ];
+	MODE_ACC -> MODE_ACC [ label = "sensor_we_mode!=0"]
+	MODE_ACC -> WAIT_1D [ label = "sensor_we_mode=0"]
+	WAIT_1D -> WAIT_1D [ label = "sensor_we_valid=0"]
+	WAIT_1D -> SEND_DATA [ label = "sensor_we_valid=1"]
+	SEND_DATA -> WAIT_DATA [ label = "current_addr<FSIZE-1"]
+	SEND_DATA -> END_ACC [ label = "current_addr=FSIZE-1"]
+	WAIT_DATA -> WAIT_DATA [ label = "sensor_we_valid=0"]
+	WAIT_DATA -> SEND_DATA [ label = "sensor_we_valid=1"]
+	END_ACC -> MODE_FSM [ label = ""]
+	MODE_WEIGHT -> MODE_WEIGHT [ label = "sensor_we_mode=0"]
+	MODE_WEIGHT -> NOTIFY_1N [ label = "sensor_we_mode=1"]
+	NOTIFY_1N  -> WAIT_WEIGHT [ label = "sensor_we_shift=1"]
+	NOTIFY_1N  -> NOTIFY_1N [ label = "sensor_we_shift=0"]
+	WAIT_WEIGHT -> WAIT_WEIGHT [ label = "sensor_we_valid=0"]
+	WAIT_WEIGHT -> SEND_WEIGHT [ label = "sensor_we_valid=1"]
+	SEND_WEIGHT -> SHIFT_NOTIFY [ label = "current_addr=FSIZE-1"]
+	SEND_WEIGHT -> WAIT_WEIGHT [ label = "current_addr<FSIZE-1"]
+	SHIFT_NOTIFY -> WAIT_NOTIFY [ label = ""]
+	WAIT_NOTIFY -> WAIT_NOTIFY [ label = "nN_we_next=0 && sensor_we_shift=0"]
+	WAIT_NOTIFY -> WAIT_WEIGHT [ label = "nN_we_next=0 && sensor_we_shift=1"]
+	WAIT_NOTIFY -> END_CONFIG [ label = "nN_we_next=1"]
+	END_CONFIG -> MODE_FSM [ label = ""]
+}
+
