@@ -1,1 +1,113 @@
-A remplir
+%section{cahier des charges détaillé}
+
+\subsection{Présentation générale du problème}
+
+\subsubsection{Projet}
+Le but du sujet est de réaliser un réseau de neurones sur FPGA.
+
+TODO : INSERER SCHEMA CLASSIQUE DE RESEAU DE NEURONES ET UNE BREVE DESCRIPTION
+
+\paragraph{Finalités\\}
+
+Ce réseau de neurones sur FPGA a pour but d'établir une référence pour pouvoir
+comparer un réseau de neurones ternaire en cours de développement au laboratoire
+TIMA à un réseau de neurones plus classique, tous deux réalisés sur le même 
+matériel.
+
+Un objectif secondaire serait de comparer le composant réalisé à d'autres
+produits similaires tels que la puce neuromorphique Spinnaker de l'université
+de Manchester, ou bien la puce TrueNorth d'IBM.
+
+\subsubsection{Contexte}
+
+Le projet sera réalisé au CIME Nanotech, à Grenoble. 
+
+Quatre heures par semaine sont alloués à la réalisation de ce projet. Cependant,
+il est nécessaire de travailler en dehors des horaires scolaires pour terminer 
+le projet.
+
+Les tests sur carte FPGA seront réalisés dans un premier temps sur une carte Zybo,
+puis une fois la fonctionnalité du composant validée, les tests se poursuivront 
+sur carte ZedBoard.
+
+\subsubsection{Énoncé du besoin}
+%(finalités du produit pour le futur utilisateur tel que prévu par le demandeur)
+Les finalités du produit pour le futur utilisateur tel que prévu par le
+demandeur sont:
+\begin{itemize}
+	\item Le composant doit pouvoir être programmable dynamiquement, 
+		c'est-à-dire qu'il doit être possible de changer le nombre de
+		neurones par étage et les coefficients de chaque étage
+		(niveau de neurones et étage de recode).
+	\item Le composant doit être générique, c'est-à-dire qu'il faut pouvoir
+		changer simplement le nombre de neurones, des données d'entrées
+		et des autres paramètres en changeant une variable dans les
+		fichiers HDL du composant.
+	\item Le composant doit produire le résultat attendu, c'est-à-dire qu'il
+		doit calculer le résultat du réseau de neurones qu'il représente.
+\end{itemize}
+
+\subsection{Expression fonctionnelle du besoin}
+
+\subsubsection{Fonctions de service et de contrainte}
+
+\paragraph{Fonctions de service principales\\}
+% (qui sont la raison d’être du produit)
+
+Le produit doit calculer le résultat d'une donnée d'entrée soumise à un réseau
+de neurones, paramétré selon les coefficients précédemment donnés au composant.
+
+\paragraph{Fonctions de service complémentaires\\}
+% (qui améliorent, facilitent ou complètent le service rendu)
+
+\paragraph{Contraintes\\}
+% (limitations à la liberté du concepteur-réalisateur)
+
+L'architecture globale du composant et ses interfaces (bus) sont déterminées
+par le laboratoire TIMA.
+
+Le composant devra utiliser les cellules DSP du FPGA pour réaliser l'accumulation
+d'un neurone.
+
+\paragraph{Décomposition en modules, sous-ensembles\\}
+
+% TODO insérer schéma global (haut-niveau) du composant
+TODO : INSERER SCHEMA HAUT NIVEAU DU COMPOSANT
+ET UNE EXPLICATION SOMMAIRE
+
+\subsubsection{Critères d’appréciation}
+% (en soulignant ceux qui sont déterminants pour l’évaluation des réponses)
+
+Les critères permettant de mesurer la qualité du composant produit sont:
+\begin{itemize}
+	\item Correction du composant : le résultat doit être celui attendu.
+	\item Taux d'utilisation des cellules du FPGA
+	\item Performances du composant (fréquence, nombre de cycles pour
+		calculer le résultat ...)
+	\item Généricité du composant
+\end{itemize}
+
+\subsubsection{Niveaux des critères d’appréciation}
+% et ce qui les caractérise
+
+\paragraph{Niveaux dont l’obtention est imposée\\}
+
+Il est nécessaire que le composant satisfasse les niveaux de critères suivants:
+\begin{itemize}
+	\item Correction : le résultat doit être correct
+	\item Taux d'utilisation des cellules du FPGA : un neurone doit utiliser
+		une cellule DSP.
+\end{itemize}
+
+\paragraph{Niveaux souhaités mais révisables\\}
+
+Il est souhaitable que le composant satisfasse les niveaux de critères suivants:
+\begin{itemize}
+	\item Performances : Le résultat d'un calcul du composant doit être plus
+		rapide que son équivalent réalisé sur un processeur classique.
+	\item Généricité : Les fichiers HDL du composant doivent pouvoir être
+		modifié de façon mineure pour changer les paramètres du réseau
+		de neurones.
+\end{itemize}
+
+
