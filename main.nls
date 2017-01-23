@@ -1,0 +1,16 @@
+\begin{thenomenclature} 
+
+ \nomgroup{A}
+
+  \item [{DSP}]\begingroup Digital Signal Processing : Composant électronique disponible dans le FPGA permettant de faire des multiplication et addition de façon optimisée.\nomeqref {0}
+		\nompageref{8}
+  \item [{FIFO}]\begingroup First In First Out : structure de données permettant de stocker des données et de les restitué dans l'ordre d'arrivée.\nomeqref {0}
+		\nompageref{8}
+  \item [{FPGA}]\begingroup Field-Programmable Gate Array : circuits intégrés re-programmables\nomeqref {0}
+		\nompageref{8}
+  \item [{IP}]\begingroup Intellectual Property: Bloc hardware réutilisable ayant une fonctionnalité spécifique\nomeqref {0}
+		\nompageref{8}
+  \item [{MNIST}]\begingroup Mixed National Institute of Standards and Technology : Base de données de caractère manuscrit servant de tests à de nombreux algorithmes de reconnaissance d'écriture\nomeqref {0}
+		\nompageref{8}
+
+\end{thenomenclature}
