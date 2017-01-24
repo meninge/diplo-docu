@@ -1,5 +1,13 @@
+*.DS_Store
 *.pdf
 *.toc
 *.aux
 *.log
 *.nlo
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.ilg
+*.nls
+main.synctex.gz
