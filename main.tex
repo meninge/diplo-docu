@@ -20,21 +20,22 @@
 \usepackage{wrapfig}
 % -- Pour les indentations au 1er paragraph
 \usepackage{indentfirst}
-% -- Pour quelques truc de math 
+% -- Pour quelques truc de math
 \usepackage{amsmath}
 \usepackage{SIunits}
 
 % -- Pour le planning Gantt
+\usepackage{textcomp}
+\usepackage[babel=true, kerning=true]{microtype}
 \usepackage{pgfgantt}
 \usepackage{xcolor}
-%\usetikzlibrary{positioning}
 
 \ganttset{group/.append style={orange},
 	milestone/.append style={red},
 	progress label node anchor/.append style={text=red}}
 
 
-% -- For the biblio in the table of content 
+% -- For the biblio in the table of content
 \usepackage[nottoc]{tocbibind}
 
 % -- for apendix
@@ -54,13 +55,13 @@
 
    % -- Page de garde :
 \maketitle
-   
+
 %\begin{figure}[h!]
 %    \centering
 %    %\includepdf[pages={1}]{data/FirstPage.pdf}
 %    \label{fig:first}
 %\end{figure}
-   
+
 \pagebreak
 \tableofcontents
 
