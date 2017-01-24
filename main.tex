@@ -24,6 +24,16 @@
 \usepackage{amsmath}
 \usepackage{SIunits}
 
+% -- Pour le planning Gantt
+\usepackage{pgfgantt}
+\usepackage{xcolor}
+%\usetikzlibrary{positioning}
+
+\ganttset{group/.append style={orange},
+	milestone/.append style={red},
+	progress label node anchor/.append style={text=red}}
+
+
 % -- For the biblio in the table of content 
 \usepackage[nottoc]{tocbibind}
 
@@ -34,14 +44,12 @@
 \usepackage{nomencl}
 \makenomenclature
 \renewcommand{\nomname}{List of Symbols}
-
-% -- Config --
 \pagestyle{fancy}
 
 % -- Document --
 
 \title{Implémentation d'un réseau de neurones sur FPGA}
-\author{Hugues de Valon\\ Paul Luperini\\ Lucas Mahieu}
+\author{Paul Luperini\\ Lucas Mahieu\\Hugues de Valon}
 \begin{document}
 
    % -- Page de garde :
