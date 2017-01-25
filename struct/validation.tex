@@ -1,1 +1,154 @@
-A remplir
+%TODO : améliorer la description des test benchs de simulation.
+%TODO : écrire la partie sur la validation sur carte (préciser l'utilisation des
+% registres etc.
+
+La validation est une partie importante de notre projet. En effet, elle permet
+d'assurer le bon fonctionnement de notre IP.
+
+Pour valider notre IP, nous avons du avoir recours à deux modes de validation :
+la validation en simulation et la validation sur carte.
+En effet, le simulateur ne permet pas de simuler notre IP complète avec le bus
+AXI et le processeur ARM, il faut donc avoir recours à une validation sur carte
+Zybo et Zedboard.
+
+\subsection{validation en simulation}
+
+La validation en simulation permet de vérifier le comportement de chacun des
+composants de notre IP, individuellement et en association avec d'autres
+composants.
+
+Les simulations ont été réalisé à l'aide du simulateur de Xilinx Vivado.
+
+\subsubsection{Le neurone}
+
+%TODO: LUCAS
+%TODO: à compléter
+TODO: LUCAS
+
+\subsubsection{La machine à états}
+
+La machine à états contrôle l'ensemble des neurones d'un niveau de neurones.
+Ce test bench permet de vérifier le comportement précis de la machine
+à états du niveau de neurones.\\
+
+Durant ce test bench, nous avons vérifié que la machine à états:
+\begin{itemize}
+	\item est dans l'état attendu tout au long du test bench.
+	\item contrôle correctement un neurone, à partir du fonctionnement
+	détaillé dans les spécifications.
+	\item passe en mode chargement des poids ou accumulation et a le
+	comportement attendu dans chacun des cas.
+	\item effectue un décalage de la chaîne de miroir à la fin d'une
+	accumulation.
+\end{itemize}
+%TODO: à compléter
+
+\subsubsection{Le niveau de neurones}
+
+Le niveau de neurones est composé d'une machine à états et de neurones.
+Ce test bench permet de s'assurer que la machine à états et les neurones
+interagissent correctement ensemble et que l'on tient bien compte des buffers
+de distribution des signaux.\\
+
+Durant ce test bench, nous avons vérifié que la machine à états:
+\begin{itemize}
+	\item contrôle correctement plusieurs neurones, en tenant
+	compte des buffers de distribution des signaux qui ajoutent un
+	délai dans la communication.
+	\item passe en mode chargement des poids ou accumulation et a le
+	comportement attendu dans chacun des cas.
+	\item effectue un décalage de la chaîne de miroir à la fin d'une
+	accumulation.
+\end{itemize}
+
+Nous avons vérifié que les neurones:
+\begin{itemize}
+	\item chargent correctement les poids en mode chargement des poids.
+	\item en mode accumulation, accumulent correctement les données et
+	décalent le résultat dans la chaîne de miroir à la fin de
+	l'accumulation.
+	\item se passent correctement les données dans leurs miroirs lors
+	de la phase de décalage des miroirs, en mode accumulation.
+\end{itemize}
+%TODO: à compléter
+
+\subsubsection{Le recodage}
+
+L'étage de recodage permet d'ajouter une constante aux valeurs en sortie du
+niveau de neurones et de supprimer les valeurs négatives.\\
+
+Durant ce test bench, nous avons vérifié que l'étage de recodage:
+\begin{itemize}
+	\item charge ses poids en mode chargement des poids.
+	\item en mode accumulation, ajoute une constante propre à chaque neurone
+	à la donnée d'entrée, vérifie que le résultat est positif, le transmet à
+	la FIFO suivante dans ce cas, ou transmet 0 dans le cas contraire.
+\end{itemize}
+%TODO: à compléter
+
+\subsubsection{Interaction FIFO-niveau de neurones}
+
+Ce test bench permet de s'assurer que la FIFO d'entrée d'un niveau de neurones
+est bien contrôlée par le niveau de neurones correspondant.\\
+
+Durant ce test bench, nous avons vérifié que le niveau de neurones:
+\begin{itemize}
+	\item contrôle correctement la FIFO d'entrée, c'est-à-dire qu'il prend
+	les données quand elles sont disponibles, et ce pour les deux modes
+	(accumulation et chargement des poids).
+	\item contrôle correctment la FIFO de sortie, c'est-à-dire qu'il envoie
+	des données à l'intérieur uniquement s'il y a suffisamment de place dans
+	le mode accumulation. Dans le mode chargement des poids, il ne doit pas
+	y avoir d'envoi de données dans cette FIFO.
+\end{itemize}
+%TODO: à compléter
+
+\subsubsection{Interaction FIFO-recodage-FIFO}
+
+Ce test bench permet de vérifier qu'un étage de recodage contrôle bien ses FIFOs
+d'entrée et de sortie.\\
+
+Durant ce test bench, nous avons vérifié que l'étage de recodage:
+\begin{itemize}
+	\item contrôle correctement la FIFO d'entrée, c'est-à-dire qu'il prend
+	les données quand elles sont disponibles, et ce pour les deux modes
+	(accumulation et chargement des poids). Dans le mode accumulation, il
+	ne doit prendre des données que s'il y a de la place dans la FIFO de
+	sortie.
+	\item contrôle correctment la FIFO de sortie, c'est-à-dire qu'il envoie
+	des données à l'intérieur uniquement s'il y a suffisamment de place dans
+	le mode accumulation. Dans le mode chargement des poids, il ne doit pas
+	y avoir d'envoi de données dans cette FIFO.
+\end{itemize}
+%TODO: à compléter
+
+\subsubsection{Interaction FIFO-niveau de neurones-FIFO-recodage}
+
+Ce test bench vérifie que le pipeline FIFO-niveau de neurones-FIFO-recodage
+fonctionne correctement.\\
+
+Durant ce test bench, nous avons vérifié que l'ensemble des composants:
+\begin{itemize}
+	\item charge ses poids en mode chargement des poids, chacun son tour.
+	De plus, ils ne doivent pas se comporter de façon incorrecte quand
+	ils ne sont ni en train de charger les poids ni en train d'accumuler.
+	\item effectue l'opération d'accumulation en mode accumulation, prend
+	les données dans sa FIFO d'entrée et transmet les données en sortie
+	uniquement s'il y a de la place.
+\end{itemize}
+%TODO: à compléter
+
+\subsubsection{Conclusion}
+
+Avec l'ensemble des tests en simulation, nous avons couvert tout le pipeline de
+notre IP. En effet, chaque composant a été testé individuellement et nous avons
+testé les interactions entre FIFO-niveau de neurones-FIFO, FIFO-recode-FIFO.
+Nous avons donc vérifié que le pipeline complet
+FIFO-niveau de neurones-FIFO-recodage-FIFO-niveau de neurones-FIFO fonctionne
+correctement.
+
+Ces tests nous permettent de couvrir l'ensemble de interactions entre composants
+de notre IP.
+
+\subsection{validation sur carte}
+%TODO: à compléter
