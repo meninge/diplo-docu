@@ -1,6 +1,6 @@
-Pour travailler de façon efficace, il est essentiel 
+Pour travailler de façon efficace, il est essentiel
 d'établir les dépendances entre les tâches et de les répartir entre les membres
-du groupe. 
+du groupe.
 
 \subsection{Planning}
 
@@ -8,11 +8,11 @@ Sur la figure~\ref{fig:PlanningPrevision}~page~\pageref{fig:PlanningPrevision},
 les tâches ont été réparties temporellement sur la période du projet. Ce planning
 prévisionnel a été dans l'ensemble bien respecté durant tout le projet.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\begin{ganttchart}
 		[y unit title=0.4cm,
 			y unit chart=0.5cm,
-			vgrid,hgrid, 
+			vgrid,hgrid,
 			title label anchor/.style={below=-1.6ex},
 			title left shift=.05,
 			title right shift=-.05,
@@ -25,14 +25,14 @@ prévisionnel a été dans l'ensemble bien respecté durant tout le projet.
 			group top shift=.6,
 			group height=.3,
 		]
-		{20}{20}
+		{1}{20}
 		%labels
 		\gantttitle{Projet}{20} \\
-		\gantttitle{Oct}{4} 
-		\gantttitle{Nov}{4} 
-		\gantttitle{Dec}{4} 
-		\gantttitle{Jan}{4} 
-		\gantttitle{Feb}{4} 
+		\gantttitle{Oct}{4}
+		\gantttitle{Nov}{4}
+		\gantttitle{Dec}{4}
+		\gantttitle{Jan}{4}
+		\gantttitle{Feb}{4}
 		\ganttnewline
 
 		%tasks
@@ -57,10 +57,10 @@ prévisionnel a été dans l'ensemble bien respecté durant tout le projet.
 
 		%relations
 
-		\ganttlink{elem0}{elem2} 
-		\ganttlink{elem0}{elem3} 
-		\ganttlink{elem4}{elem6} 
-		\ganttlink{elem5}{elem6} 
+		\ganttlink{elem0}{elem2}
+		\ganttlink{elem0}{elem3}
+		\ganttlink{elem4}{elem6}
+		\ganttlink{elem5}{elem6}
 	\end{ganttchart}
 	\caption{Planning prévisionnel}
 	\label{fig:PlanningPrevision}
@@ -68,7 +68,7 @@ prévisionnel a été dans l'ensemble bien respecté durant tout le projet.
 
 Voici la description des différentes tâches:
 \begin{itemize}
-	\item \textbf{Spécifications}: écrire les spécifications du 
+	\item \textbf{Spécifications}: écrire les spécifications du
 		réseau de neurones sur FPGA, définir son architecture.
 	\item \textbf{Programme de référence}: écriture du programme en C
 		permettant de comparer les résultats de notre IP à une version
@@ -97,7 +97,7 @@ Voici la description des différentes tâches:
 
 \subsection{Répartition entre les membres du groupe}
 
-La plupart des tâches étant parallélisables, nous avons donc pu les répartir 
+La plupart des tâches étant parallélisables, nous avons donc pu les répartir
 entre les membres du groupe.
 
 Voici les occupations principales de chaque personne:
