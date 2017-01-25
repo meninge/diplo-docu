@@ -1,1 +1,89 @@
-A remplir
+% Etapes de conception, insister sur :
+% architecture, choix, caractéristiques finales du système implanté
+
+Nous allons présenter dans cette partie les principales étapes de conception
+de notre réseau de neurones en détaillant tous les blocs réalisés et les choix
+faits a propos de leur architecture.
+
+\subsection{Programme de référence}
+% Description du programme de référence en C, de l'utilisation de la base
+% de données MNIST, du script en Python, des tableaux contenant les données,
+% du taux d'erreur.
+Le programme de référence implémente le même réseau de neurone que notre IP
+mais directement en C. On peut ainsi l'executer en local et comparer les résultats
+avec l'implémentation réelle.
+
+\begin{algorithm}
+	\SetAlgoLined
+	\For {$f \leftarrow 0$ \KwTo $frames$} {
+		$out1[neurons] \leftarrow 0$\;
+		$out2[10] \leftarrow 0$\;
+		\For {$r \leftarrow 0$ \KwTo $rows$} {
+			\For {$c \leftarrow 0$ \KwTo $columns$} {
+				\For {$n \leftarrow 0$ \KwTo $neurons$} {
+					$out1[n] \leftarrow out1[n] + \texttt{get\_pixel(}image, r, j\texttt{)} \times w1[n][r][c]$\;
+				}
+			}
+		}
+		\For {$n \leftarrow 0$ \KwTo $neurons$} {
+			$out1[n] \leftarrow \texttt{cut(}out1[n]\texttt{)}$\;
+			$out1[n] \leftarrow out1[n] + b1[n]$\;
+		}
+		\For {$n \leftarrow 0$ \KwTo $neurons$} {
+			\For {$i \leftarrow 0$ \KwTo $9$} {
+				$out2[i] \leftarrow out2[i] + out1[n] \times w2[i][n]$\;
+			}
+		}
+		\For {$i \leftarrow 0$ \KwTo $9$} {
+			$out2[n] \leftarrow \texttt{cut(}out2[n]\texttt{)}$\;
+			$out2[n] \leftarrow out2[n] + b2[n]$\;
+		}
+		$\texttt{assert(max(}out2\texttt{)} == \texttt{get\_label(}f\texttt{))}$\;
+	}
+	\caption{Boucle de calcul principal du réseau de neurone logiciel}
+	\label{soft_nn}
+\end{algorithm}
+
+L'algorithme \ref{soft_nn} implémente un réseau de neurones à deux étages.
+Chaque étage réalise des multiplications et accumulations de chaque pixel de
+chaque image avec des poids, spécifiques à chaque neurone. Après chaque étage,
+on additionne le résultat de chaque neurone avec une constante. \\
+La configuration actuelle de ce réseau de neurone est adaptée pour la
+reconaissance de chiffres manuscrits de la base de données MNIST. Une frame
+en entrée ($28 \times 28$ pixels) correspond à un chiffre manuscrit de 0 à 9.
+Le but de ce réseau de neurone est de reconnaître est d'identifier le chiffre
+d'une frame. Pour une frame donnée, le chiffre identifié par le réseau correspond
+au numéro du neurone de sortie qui a la plus grande valeur. \\
+Dans ce modèle logiciel, les pixels sont sur un octet, les poids et les
+constantes sont sur 2 octets. Afin que dans le pire cas, aucune information ne
+soit perdue lors de l'accumulation aux différents étages, on la réalise sur
+8 octets mais on ne doit en sélectionner que 2 pour effectuer l'ajout de la constante
+sur des nombres de même taille et envoyer ce résultat au deuxième niveau. C'est
+le rôle de la fonction \texttt{cut} qui permet de passer de 64 à 16 bits tout
+en conservant le signe. Afin de choisir le bon masque, nous avons effectué
+plusieurs essais et gardé celui qui menait au plus bas taux d'erreur.
+\begin{center}
+    \begin{tabular}{| l | l |}
+    \hline
+    Masque & Taux d'erreur \\ \hline
+    0xFFFF0000 & 91.30 \\ \hline
+    0x0FFFF000 & 91.30 \\ \hline
+    0x03FFFC00 & 83.10 \\ \hline
+    0x01FFFE00 & 28.80 \\ \hline
+    0x00FFFF00 & 11.60 \\ \hline
+    0x007FFF80 & 16.30 \\ \hline
+    0x000FFFF0 & 90.70 \\ \hline
+    \end{tabular}
+\end{center}
+
+
+\subsection{IP du réseau de neurones}
+% Insérer schéma global de l'IP avec les liaisons vers la DDR
+\subsubsection{Neurone}
+\subsubsection{Machine à états du niveau de neurones}
+\subsubsection{Niveau de neurones}
+\subsubsection{Recodage}
+
+\subsection{Logiciel de commande}
+
+\subsection{Caractéristiques finales du système implanté}
