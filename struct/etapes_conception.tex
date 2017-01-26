@@ -21,7 +21,7 @@ avec l'implémentation réelle.
 		\For {$r \leftarrow 0$ \KwTo $rows$} {
 			\For {$c \leftarrow 0$ \KwTo $columns$} {
 				\For {$n \leftarrow 0$ \KwTo $neurons$} {
-					$out1[n] \leftarrow out1[n] + \texttt{get\_pixel(}image, r, j\texttt{)} \times w1[n][r][c]$\;
+					$out1[n] \leftarrow out1[n] + \texttt{get\_pixel(}f, r, j\texttt{)} \times w1[n][r][c]$\;
 				}
 			}
 		}
@@ -51,7 +51,7 @@ on additionne le résultat de chaque neurone avec une constante. \\
 La configuration actuelle de ce réseau de neurone est adaptée pour la
 reconaissance de chiffres manuscrits de la base de données MNIST. Une frame
 en entrée ($28 \times 28$ pixels) correspond à un chiffre manuscrit de 0 à 9.
-Le but de ce réseau de neurone est de reconnaître est d'identifier le chiffre
+Le but de ce réseau de neurone est de reconnaître et d'identifier le chiffre
 d'une frame. Pour une frame donnée, le chiffre identifié par le réseau correspond
 au numéro du neurone de sortie qui a la plus grande valeur. \\
 Dans ce modèle logiciel, les pixels sont sur un octet, les poids et les
@@ -61,8 +61,10 @@ soit perdue lors de l'accumulation aux différents étages, on la réalise sur
 sur des nombres de même taille et envoyer ce résultat au deuxième niveau. C'est
 le rôle de la fonction \texttt{cut} qui permet de passer de 64 à 16 bits tout
 en conservant le signe. Afin de choisir le bon masque, nous avons effectué
-plusieurs essais et gardé celui qui menait au plus bas taux d'erreur.
-\begin{center}
+plusieurs essais et gardé celui qui menait au plus bas taux d'erreur (table
+\ref{masques}). \\
+\begin{table}[h!]
+\centering
     \begin{tabular}{| l | l |}
     \hline
     Masque & Taux d'erreur \\ \hline
@@ -74,8 +76,38 @@ plusieurs essais et gardé celui qui menait au plus bas taux d'erreur.
     0x007FFF80 & 16.30 \\ \hline
     0x000FFFF0 & 90.70 \\ \hline
     \end{tabular}
-\end{center}
-
+    \caption{Essais de différents masques en fonction du taux d'erreur}
+    \label{masques}
+\end{table}
+Nous masquons ainsi les résultats du premier niveau avec la valeur sur 64 bits
+\texttt{0x00FFFF00} (les bits de poids fort ne sont pas représentés ici) puis
+nous effectuons un décalage pour garder uniquement ces bits, de 8 à 23. Ce
+résultat nous a aussi aidé pour effectuer le même masque et décalage dans notre
+réseau de neurones matériel. \\
+Les poids de ces neurones et les constantes des étages de recodage
+pour l'application MNIST, que nous utilisons dans
+le logiciel de référence et dans notre IP nous ont été fournis au début du projet
+sous forme de fichier texte où sont présentes toutes les données, séparées par
+des virgules, et où chaque ligne correspond à un neurone. Un script Python nous
+a permis de parser ces fichiers pour récupérer les données utiles et de les
+replacer dans un unique fichier crée \texttt{net.c} avec les définitions de
+4 tableaux d'entiers. Ce fichier est inclus et compilé dans le logiciel de référence et
+le logiciel embarqué ; ainsi les données des poids et des constantes sont
+facilement accessibles. \\
+Concernant les données des frames, nous les avons récupérées à partir du site
+officiel MNIST (\texttt{yann.lecun.com/exdb/mnist/} sous forme de fichiers
+binaires où 1000 frames de taille $28 \times 28$ pixels sont représentés comme
+des tableaux d'octets en C. Un autre fichier binaire nous permet de connaître
+le résultat, c'est à dire le digit, de chacune de ses frames afin de comparer le
+résultat de notre réseau de neurones avec le résultat attendu.
+Les fonctions \texttt{get\_pixel} et \texttt{get\_label} permettent d'obtenir
+facilement ces informations depuis le logiciel. \\
+Les résultats du logiciel de référence en sortie de chacun des niveaux nous
+sont utiles pour les comparer avec ceux de notre IP et s'assurer que les calculs
+sont justes pour la classification des frames MNIST. On s'attend à trouver
+un même taux d'erreur minimal ($11.60\%$) car les configurations sont identiques
+mais un calcul beaucoup plus rapide de toutes les frames.
+% TODO: compléter en fonctions des derniers résultats
 
 \subsection{IP du réseau de neurones}
 % Insérer schéma global de l'IP avec les liaisons vers la DDR
