@@ -10,8 +10,10 @@ faits a propos de leur architecture.
 % de données MNIST, du script en Python, des tableaux contenant les données,
 % du taux d'erreur.
 Le programme de référence implémente le même réseau de neurone que notre IP
-mais directement en C. On peut ainsi l'executer en local et comparer les résultats
-avec l'implémentation réelle.
+mais directement en C. On peut ainsi l'executer sur un PC ou un micro-processeur 
+et comparer les résultats avec l'implémentation réelle sur FPGA.
+
+\subsubsection{L'algorithme}
 
 \begin{algorithm}
 	\SetAlgoLined
@@ -44,25 +46,29 @@ avec l'implémentation réelle.
 	\label{soft_nn}
 \end{algorithm}
 
-L'algorithme \ref{soft_nn} implémente un réseau de neurones à deux étages.
-Chaque étage réalise des multiplications et accumulations de chaque pixel de
-chaque image avec des poids, spécifiques à chaque neurone. Après chaque étage,
-on additionne le résultat de chaque neurone avec une constante. \\
+L'algorithme~\ref{soft_nn} page~\pageref{soft_nn} implémente un réseau de neurones à deux étages.
+Chaque étage réalise des multiplications et accumulations pour chaque pixel de
+chaque image avec des poids, spécifiques à chaque neurone. Après chaque étage, 
+le résultat de chaque neurone est additionné avec une constante. 
+
+\subsubsection{Les données à traiter dans le réseau}
+
 La configuration actuelle de ce réseau de neurone est adaptée pour la
-reconaissance de chiffres manuscrits de la base de données MNIST. Une frame
+reconnaissance de chiffres manuscrits de la base de données MNIST. Une image
 en entrée ($28 \times 28$ pixels) correspond à un chiffre manuscrit de 0 à 9.
 Le but de ce réseau de neurone est de reconnaître et d'identifier le chiffre
-d'une frame. Pour une frame donnée, le chiffre identifié par le réseau correspond
+d'une image. Pour une image donnée, le chiffre identifié par le réseau correspond
 au numéro du neurone de sortie qui a la plus grande valeur. \\
-Dans ce modèle logiciel, les pixels sont sur un octet, les poids et les
+Dans ce modèle logiciel, les pixels sont encodés sur un octet, les poids et les
 constantes sont sur 2 octets. Afin que dans le pire cas, aucune information ne
-soit perdue lors de l'accumulation aux différents étages, on la réalise sur
-8 octets mais on ne doit en sélectionner que 2 pour effectuer l'ajout de la constante
+soit perdue lors de l'accumulation aux différents étages, on réalise cette opération sur
+8 octets. Cependant, on ne doit en sélectionner que 2 sur les 8 pour effectuer l'ajout de la constante
 sur des nombres de même taille et envoyer ce résultat au deuxième niveau. C'est
 le rôle de la fonction \texttt{cut} qui permet de passer de 64 à 16 bits tout
 en conservant le signe. Afin de choisir le bon masque, nous avons effectué
 plusieurs essais et gardé celui qui menait au plus bas taux d'erreur (table
-\ref{masques}). \\
+\ref{masques} page~\pageref{masques}).
+
 \begin{table}[h!]
 \centering
     \begin{tabular}{| l | l |}
@@ -76,37 +82,44 @@ plusieurs essais et gardé celui qui menait au plus bas taux d'erreur (table
     0x007FFF80 & 16.30 \\ \hline
     0x000FFFF0 & 90.70 \\ \hline
     \end{tabular}
-    \caption{Essais de différents masques en fonction du taux d'erreur}
+    \caption{Essais de différents masques et leur taux d'erreur}
     \label{masques}
 \end{table}
-Nous masquons ainsi les résultats du premier niveau avec la valeur sur 64 bits
+
+Ainsi, nous masquons les résultats du premier niveau avec le masque sur 64 bits
 \texttt{0x00FFFF00} (les bits de poids fort ne sont pas représentés ici) puis
 nous effectuons un décalage pour garder uniquement ces bits, de 8 à 23. Ce
-résultat nous a aussi aidé pour effectuer le même masque et décalage dans notre
-réseau de neurones matériel. \\
-Les poids de ces neurones et les constantes des étages de recodage
+résultat nous a aussi aidé à effectuer le même masque et décalage dans notre
+réseau de neurones matériel.
+
+\subsubsection{Mise en forces des données MNIST}
+
+Les poids des neurones et les constantes des étages de recodage
 pour l'application MNIST, que nous utilisons dans
 le logiciel de référence et dans notre IP nous ont été fournis au début du projet
 sous forme de fichier texte où sont présentes toutes les données, séparées par
 des virgules, et où chaque ligne correspond à un neurone. Un script Python nous
-a permis de parser ces fichiers pour récupérer les données utiles et de les
-replacer dans un unique fichier crée \texttt{net.c} avec les définitions de
+a permis d'analyser ces fichiers pour récupérer les données utiles et de les
+replacer dans un unique fichier créé \texttt{net.c} avec les définitions de
 4 tableaux d'entiers. Ce fichier est inclus et compilé dans le logiciel de référence et
-le logiciel embarqué ; ainsi les données des poids et des constantes sont
-facilement accessibles. \\
-Concernant les données des frames, nous les avons récupérées à partir du site
-officiel MNIST (\texttt{yann.lecun.com/exdb/mnist/} sous forme de fichiers
+pour le logiciel embarqué; ainsi les poids et les constantes sont
+facilement accessibles depuis le logiciel. \\
+Concernant les images, nous les avons récupérées à partir du site
+officiel MNIST \linebreak (\texttt{yann.lecun.com/exdb/mnist/}) sous forme de fichiers
 binaires où 1000 frames de taille $28 \times 28$ pixels sont représentés comme
 des tableaux d'octets en C. Un autre fichier binaire nous permet de connaître
-le résultat, c'est à dire le digit, de chacune de ses frames afin de comparer le
+le résultat, c'est-à-dire le digit, de chacune de ces images afin de comparer le
 résultat de notre réseau de neurones avec le résultat attendu.
 Les fonctions \texttt{get\_pixel} et \texttt{get\_label} permettent d'obtenir
-facilement ces informations depuis le logiciel. \\
+facilement ces informations depuis le logiciel.
+
+\subsubsection{Les résultats}
+
 Les résultats du logiciel de référence en sortie de chacun des niveaux nous
 sont utiles pour les comparer avec ceux de notre IP et s'assurer que les calculs
-sont justes pour la classification des frames MNIST. On s'attend à trouver
+sont justes pour la classification des images MNIST. On s'attend à trouver
 un même taux d'erreur minimal ($11.60\%$) car les configurations sont identiques
-mais un calcul beaucoup plus rapide de toutes les frames.
+mais un calcul beaucoup plus rapide de toutes les images.
 % TODO: compléter en fonctions des derniers résultats
 
 \subsection{IP du réseau de neurones}
