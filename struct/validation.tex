@@ -11,7 +11,7 @@ En effet, le simulateur ne permet pas de simuler notre IP complète avec le bus
 AXI et le processeur ARM, il faut donc avoir recours à une validation sur carte
 Zybo et Zedboard.
 
-\subsection{validation en simulation}
+\subsection{Validation en simulation}
 
 La validation en simulation permet de vérifier le comportement de chacun des
 composants de notre IP, individuellement et en association avec d'autres
@@ -96,7 +96,7 @@ Durant ce test bench, nous avons vérifié que le niveau de neurones:
 	\item contrôle correctement la FIFO d'entrée, c'est-à-dire qu'il prend
 	les données quand elles sont disponibles, et ce pour les deux modes
 	(accumulation et chargement des poids).
-	\item contrôle correctment la FIFO de sortie, c'est-à-dire qu'il envoie
+	\item contrôle correctement la FIFO de sortie, c'est-à-dire qu'il envoie
 	des données à l'intérieur uniquement s'il y a suffisamment de place dans
 	le mode accumulation. Dans le mode chargement des poids, il ne doit pas
 	y avoir d'envoi de données dans cette FIFO.
@@ -115,7 +115,7 @@ Durant ce test bench, nous avons vérifié que l'étage de recodage:
 	(accumulation et chargement des poids). Dans le mode accumulation, il
 	ne doit prendre des données que s'il y a de la place dans la FIFO de
 	sortie.
-	\item contrôle correctment la FIFO de sortie, c'est-à-dire qu'il envoie
+	\item contrôle correctement la FIFO de sortie, c'est-à-dire qu'il envoie
 	des données à l'intérieur uniquement s'il y a suffisamment de place dans
 	le mode accumulation. Dans le mode chargement des poids, il ne doit pas
 	y avoir d'envoi de données dans cette FIFO.
@@ -150,5 +150,5 @@ correctement.
 Ces tests nous permettent de couvrir l'ensemble de interactions entre composants
 de notre IP.
 
-\subsection{validation sur carte}
+\subsection{Validation sur carte}
 %TODO: à compléter
