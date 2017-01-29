@@ -123,12 +123,82 @@ mais un calcul beaucoup plus rapide de toutes les images.
 % TODO: compléter en fonctions des derniers résultats
 
 \subsection{IP du réseau de neurones}
-% Insérer schéma global de l'IP avec les liaisons vers la DDR
-\subsubsection{Neurone}
-\subsubsection{Machine à états du niveau de neurones}
-\subsubsection{Niveau de neurones}
-\subsubsection{Recodage}
+
+\begin{figure}[h!]
+    \begin{center}
+    	\includegraphics[scale=0.4]{NNSchema}
+    	\label{fig:NNSchema}
+    	\caption{Schéma de l'IP réseau de neurones dans son environnement }
+    \end{center}
+\end{figure}
+
+\subsubsection{Le neurone}
+	Le neurones est l'élément de base de notre réseau. 
+	C'est donc la première chose que nous avons implémenter. 
+	Pour faire cela, nous avons pensé le neurone en terme de 
+	fonctionnalités uniquement. 
+	Nous allons donc décrire ici la façons dont nous avons conçu un neurone. 
+	Un neurones a deux modes de fonctionnement. 
+	Le premier est le mode de chargement des poids en mémoire, le second 
+	est le mode de calculs.
+	
+	\subsubsection{Le mode de chargement des poids}
+	Pour permettre aux neurones d'accomplir leur rôle principale, il faut que chaque neurone ai 
+	accès à leur poids. Etant donné que chaque neurone doit disposer de ces propres poids 
+	(identiques pour une application donnée et donc pour une grandes quantité d'images) 
+	il est donc préférable que chaque neurone les mémorise. Afin d'accomplir cela, 
+	les neurones reçoivent une adresse (numero du poids à mémoriser) ainsi qu'un poids. 
+	Ainsi, un neurones peut mémorisent le poids présent sur son entrée dans 
+	sa BRAM à l'adresse reçue à condition que ce neurones possède le {\em token} de 
+	configuration et qu'il reçoive le signal lui indiquant qu'un poids est présent sur son entrée.\\
+	Le token de configuration est passé de neurones en neurones 
+	sur ordre du signal de contrôle pour qu'ils se configurent les uns après les autres. 
+	Vous trouverez une illustration de ce fonctionnement en 
+	figure~\ref{N_poids} page~\pageref{N_poids}.
+	\begin{figure}[h!]
+    		\begin{center}
+    			\includegraphics[scale=0.4]{N_poids}
+    			\caption{Schéma fonctionnel de l'implémentation du neurone en mode de configuration}
+		\end{center}
+		\label{N_poids}
+	\end{figure}
+	
+	\subsubsection{Le mode de calcul}
+	\begin{figure}[h!]
+    		\begin{center}
+    			\includegraphics[scale=0.4]{N_calcul}
+    			\caption{Schéma fonctionnel de l'implémentation du neurone en mode de calcul}
+		\end{center}
+    		\label{N_calcul}
+	\end{figure}
+
+\subsubsection{La machine à états (FSM) du niveau de neurones}
+\subsubsection{Le niveau de neurones}
+\subsubsection{L'étage de recodage}
 
 \subsection{Logiciel de commande}
 
 \subsection{Caractéristiques finales du système implanté}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
