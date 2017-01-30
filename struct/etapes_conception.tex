@@ -144,11 +144,11 @@ mais un calcul beaucoup plus rapide de toutes les images.
 
 	\subsubsection{Le mode de chargement des poids}
 	Pour permettre aux neurones d'accomplir leur rôle principale, il faut que chaque neurone ai
-	accès à leur poids. Etant donné que chaque neurone doit disposer de ces propres poids
+	accès à leurs poids. Etant donné que chaque neurone doit disposer de ces propres poids
 	(identiques pour une application donnée et donc pour une grandes quantité d'images)
 	il est donc préférable que chaque neurone les mémorise. Afin d'accomplir cela,
 	les neurones reçoivent une adresse (numero du poids à mémoriser) ainsi qu'un poids.
-	Ainsi, un neurones peut mémorisent le poids présent sur son entrée dans
+	Alors le neurones peut mémoriser le poids présent sur son entrée dans
 	sa BRAM à l'adresse reçue à condition que ce neurones possède le {\em token} de
 	configuration et qu'il reçoive le signal lui indiquant qu'un poids est présent sur son entrée.\\
 	Le token de configuration est passé de neurones en neurones
@@ -171,21 +171,45 @@ mais un calcul beaucoup plus rapide de toutes les images.
 			\label{fig:N_calcul}
 		\end{center}
 	\end{figure}
+	
+	Le mode de calcul est le mode principal d'un neurone. C'est dans ce mode que le neurone 
+	reçoit des données et qu'il effectue une succession de multiplication à accumulation entrée 
+	la valeur du pixel reçu et le poids correspondant à l'adresse qui lui est donné. L'opération clé 
+	d'un neurone peut être écrite comme :
+	$$\sum_{adr=0}^n p_{adr}*d$$
+	avec $n$ données entrantes dans le réseau, $p_{adr}$ le poids à l'adresse $adr$ 
+	et $d$ la données entrante. 
 
+	En effectuant cette opération sur chaque pixel d'une image, un neurone du premier niveau du réseau
+	est capable de produire un résultat par image. Les neurones des niveaux suivant ne reçoivent 
+	pas des pixels mais les résultats du niveaux précédent et opère de la même façon pour enfin 
+	produire chacun un résultat (voir figure~\ref{N_calcul} page~\pageref{N_calcul}).
+	\\{\em Notez qu'entre deux niveaux les résultats passent par l'étage de recode 
+	(cf. Partie 3.2.5 "Le niveau de neurones")}.
+	
+	Une fois que chaque neurone à produit son résultat, ils vont en faire une copie dans 
+	un registre appelé {\em miroir} et remettre le registre d'accumulation à 0. Ainsi, 
+	le calcul de l'image suivante pourra être commancé alors que résultat de l'image précédente 
+	sera évacué vers la FIFO de sortie suivante. Pour ce faire, à la réception du signal 
+	{\em sauver accu dans miroir}, chaque neurones va faire passer la valeur de son 
+	registre miroir au neurone suivant et récupérer la valeur du neurone précédant.
+	Cela permet de ne connecter qu'un neurone à la FIFO 
+	et de faire évacuer les données les unes après les autres dans la FIFO 
+	(voir figure~\ref{N_calcul} page~\pageref{N_calcul}).
+	
 \subsubsection{La machine à états (FSM) du niveau de neurones}
 \subsubsection{Le niveau de neurones}
 \subsubsection{L'étage de recodage}
 
 \subsection{Logiciel de commande}
 Le logiciel de commande est le logiciel embarqué sur la carte, qui s'execute
-sur processeur ARM et qui permet de configurer notre réseau de neurones avec
+sur processeur ARM. Celui ci permet de configurer notre réseau de neurones avec
 les poids et les constantes choisies, de lancer les calculs avec les valeurs
-voulues et de récupérer les résultats. Il s'écrit en C et interface avec
+voulues et de récupérer les résultats. Il s'écrit en C et s'interface avec
 l'utilisateur grâce à la liaison série (composant UART). Le squelette de base
-était déjà disponible avec toutes les fonctions nécessaires, et le code était
+était déjà disponible avec toutes les fonctions nécessaires, le code était
 écrit pour la configuration d'un niveau de neurone, l'envoi d'images simples et
-la récupération des résultats.
-Les données
+la récupération des résultats. Les données
 concernant les poids, les constantes, les images et les paramètres (taille d'une
 image, nombre de neurones à chaque niveau, nombre d'images) étaient toutes notées
 dans un fichier (\texttt{dataset.h}). Nous avons gardé ce fonctionnement pour la
