@@ -117,5 +117,16 @@ mais un calcul beaucoup plus rapide de toutes les frames.
 \subsubsection{Recodage}
 
 \subsection{Logiciel de commande}
+Le logiciel embarqué permet de commander notre IP de réseau de neurones. Il
+permet de le configurer (poids et constante), de lui envoyer les données
+d'entrée et de récolter les résultats.
+% Liens entre l'IP et le C (DDR, DMA, nombre de burts)
+% registres de contrôle
+% allocation de tableaux alignées sur 16 * 4 octets (taille d'un burst)
+% adresse du tableau et nombre de bursts (clear nécessaire)
+% mode différent (configuration de chaque étage / frame)
+% phases de débug avec des printf et des POP de chaque étage
+% utilisation du cache (invalidate nécessaire)
+% tests avec des petites frames, peu de neurones, peu de poids
 
 \subsection{Caractéristiques finales du système implanté}
