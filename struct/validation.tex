@@ -1,6 +1,4 @@
 %TODO : améliorer la description des test benchs de simulation.
-%TODO : écrire la partie sur la validation sur carte (préciser l'utilisation des
-% registres etc.
 
 La validation est une partie importante de notre projet. En effet, elle permet
 d'assurer le bon fonctionnement de notre IP.
@@ -41,7 +39,6 @@ Durant ce test bench, nous avons vérifié que la machine à états:
 	\item effectue un décalage de la chaîne de miroir à la fin d'une
 	accumulation.
 \end{itemize}
-%TODO: à compléter
 
 \subsubsection{Le niveau de neurones}
 
@@ -70,7 +67,6 @@ Nous avons vérifié que les neurones:
 	\item se passent correctement les données dans leurs miroirs lors
 	de la phase de décalage des miroirs, en mode accumulation.
 \end{itemize}
-%TODO: à compléter
 
 \subsubsection{Le recodage}
 
@@ -84,7 +80,6 @@ Durant ce test bench, nous avons vérifié que l'étage de recodage:
 	à la donnée d'entrée, vérifie que le résultat est positif, le transmet à
 	la FIFO suivante dans ce cas, ou transmet 0 dans le cas contraire.
 \end{itemize}
-%TODO: à compléter
 
 \subsubsection{Interaction FIFO-niveau de neurones}
 
@@ -101,7 +96,6 @@ Durant ce test bench, nous avons vérifié que le niveau de neurones:
 	le mode accumulation. Dans le mode chargement des poids, il ne doit pas
 	y avoir d'envoi de données dans cette FIFO.
 \end{itemize}
-%TODO: à compléter
 
 \subsubsection{Interaction FIFO-recodage-FIFO}
 
@@ -120,7 +114,6 @@ Durant ce test bench, nous avons vérifié que l'étage de recodage:
 	le mode accumulation. Dans le mode chargement des poids, il ne doit pas
 	y avoir d'envoi de données dans cette FIFO.
 \end{itemize}
-%TODO: à compléter
 
 \subsubsection{Interaction FIFO-niveau de neurones-FIFO-recodage}
 
@@ -136,7 +129,6 @@ Durant ce test bench, nous avons vérifié que l'ensemble des composants:
 	les données dans sa FIFO d'entrée et transmet les données en sortie
 	uniquement s'il y a de la place.
 \end{itemize}
-%TODO: à compléter
 
 \subsubsection{Conclusion}
 
@@ -152,3 +144,66 @@ de notre IP.
 
 \subsection{Validation sur carte}
 %TODO: à compléter
+%TODO: LUCAS si tu veux rajouter des trucs ou affiner
+
+Suite aux tests réalisés en simulation et à l'impossibilité de simuler
+l'ensemble de la carte, nous avons dû réalisé des tests sur cartes.
+
+Ces tests nous permettent de tester le fonctionnement conjoint du logiciel, du
+bus AXI et de notre IP. Cependant, ces tests sont long (il faut générer le
+bitstream à charger dans la carte à chaque fois que l'on veut modifier le test ou
+en effectuer un autre). De plus, il est impossible d'observer l'ensemble du
+fonctionnement de notre IP une fois chargée dans le FPGA. Nous avons du avoir
+recours à des registres non utilisés pour récupérer des données et contrôler
+plus finement notre IP. Le contrôle et le débogage du logiciel se fait via GDB.
+
+\subsubsection{Tests des données envoyées}
+
+Pour vérifier que notre logiciel envoie des données correctes sur le bus à notre
+IP, via le DMA, il faut regarder les données en entrée de notre IP.
+Pour cela, nous avons légèrement modifié le code VHDL afin de bloquer les
+données dans la première FIFO tant qu'il n'y a pas de lecture dans
+un certain registre. Ainsi la lecture dans ce registre provoque la sortie de
+la première donnée de la FIFO. En sortant les données une à une, nous pouvons
+vérifier que le logiciel envoie les bonnes données.
+
+\subsubsection{Tests des données en sortie de premier niveau de neurones}
+
+Pour vérifier que le premier niveau de neurones est correctement configuré et
+renvoie les données attendues en sortie, nous avons recours au même procédé que
+dans la partie précédente, mais en sortie de la FIFO entre le premier niveau
+de neurones et l'étage de recodage.
+Ainsi, nous pouvons observer les données en sortie du premier niveau de neurones.
+En envoyant des images complètement vides(pixels à 0) sauf pour un pixel à 1,
+nous pouvons récupérer l'ensemble de la configuration du premier niveau et
+vérifier qu'elle correspond à ce que nous attendons.
+
+\subsubsection{Tests des données en sortie de l'étage de recodage}
+
+Pour vérifier que l'étage de recodage est correctement configuré et renvoie les
+données attendues en sortie, nous avons recours au même procédé que dans les
+tests sur carte précédents. Nous récupérons les données en sortie de l'étage
+de recodage via la FIFO qui est connectée à sa sortie.
+De plus, en modifiant le VHDL, il est possible de charger des données dans la
+FIFO d'entrée de l'étage de recodage de façon manuelle, en écrivant des données
+dans un certain registre. Grâce à cela, nous pouvons vérifier que l'étage
+est correctement configuré et fonctionne comme attendu.
+
+\subsubsection{Tests des données en sortie de deuxième niveau de neurones}
+
+Pour vérifier que le dernier étage de neurones est correctement configuré et
+renvoie les données attendues en sortie, on procède de la même manière que pour
+l'étage de recodage.
+On vérifie les données en sortie du niveau via un registre, et au besoin on
+contrôle son entrée via un autre registre. Grâce à cela, nous pouvons vérifier
+que l'étage est correctement configuré et fonctionne comme attendu.
+
+
+\subsubsection{Conclusion}
+
+Grâce aux tests réalisés sur carte, nous pouvons terminé de valider notre IP.
+En effet, après avoir vérifié le comportement de chaque composant en simulation,
+nous pouvons voir comment cela se passe sur carte avec le logiciel.
+Certains problèmes logiciels comme matériels sont apparus lors de cette phase,
+et ont été assez difficiles à analyser correctement à cause du manque
+d'information par rapport à une simulation classique sur ordinateur.
