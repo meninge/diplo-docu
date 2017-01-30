@@ -92,7 +92,7 @@ nous effectuons un décalage pour garder uniquement ces bits, de 8 à 23. Ce
 résultat nous a aussi aidé à effectuer le même masque et décalage dans notre
 réseau de neurones matériel.
 
-\subsubsection{Mise en forces des données MNIST}
+\subsubsection{Mise en forme des données MNIST}
 
 Les poids des neurones et les constantes des étages de recodage
 pour l'application MNIST, que nous utilisons dans
@@ -106,7 +106,7 @@ pour le logiciel embarqué; ainsi les poids et les constantes sont
 facilement accessibles depuis le logiciel. \\
 Concernant les images, nous les avons récupérées à partir du site
 officiel MNIST \linebreak (\texttt{yann.lecun.com/exdb/mnist/}) sous forme de fichiers
-binaires où 1000 frames de taille $28 \times 28$ pixels sont représentés comme
+binaires où 1000 images de taille $28 \times 28$ pixels sont représentées comme
 des tableaux d'octets en C. Un autre fichier binaire nous permet de connaître
 le résultat, c'est-à-dire le digit, de chacune de ces images afin de comparer le
 résultat de notre réseau de neurones avec le résultat attendu.
