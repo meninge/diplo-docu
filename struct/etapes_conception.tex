@@ -117,5 +117,25 @@ mais un calcul beaucoup plus rapide de toutes les frames.
 \subsubsection{Recodage}
 
 \subsection{Logiciel de commande}
+Le logiciel de commande est le logiciel embarqué sur la carte, qui s'execute
+sur processeur ARM et qui permet de configurer notre réseau de neurones avec
+les poids et les constantes choisies, de lancer les calculs avec les valeurs
+voulues et de récupérer les résultats. Il s'écrit en C et interface avec
+l'utilisateur grâce à la liaison série (composant UART). Le squelette de base
+était déjà disponible avec toutes les fonctions nécessaires, et le code était
+écrit pour la configuration d'un niveau de neurone, l'envoi d'images simples et
+la récupération des résultats.
+Les données
+concernant les poids, les constantes, les images et les paramètres (taille d'une
+image, nombre de neurones à chaque niveau, nombre d'images) étaient toutes notées
+dans un fichier (\texttt{dataset.h}). Nous avons gardé ce fonctionnement pour la
+majeur partie de notre projet car il nous a permis de tester facilement notre
+IP pour des images de petites tailles, des niveaux de neurones avec très peu
+de neurones (3) et de configurer facilement les pixels des images et les poids
+choisis pour connaître les résultats attendus et comparer avec ceux de notre IP.
+Par la suite, nous avons repris les mêmes données MNIST que pour le logiciel de
+référence afin de tester une application réelle. \\
+% à finir HUGUES
+
 
 \subsection{Caractéristiques finales du système implanté}
