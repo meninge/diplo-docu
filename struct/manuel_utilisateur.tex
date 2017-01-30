@@ -1,1 +1,80 @@
-A remplir
+%TODO : à compléter
+
+Le réseau de neurones est un composant qui communique avec le logiciel
+via le bus AXI.
+
+\subsection{Registres}
+
+Le composant réseau de neurones est composé de 16 registres de 32 bits,
+dont l'utilisation est détaillé dans le
+tableau~\ref{fig:user_manual_registers}~page~\pageref{fig:user_manual_registers}.
+
+\begin{longtable}{| p{.10\textwidth} | p{.20\textwidth} | p{.10\textwidth} | p{.50\textwidth} |}
+	\hline
+	Numéro & Read/Write & Taille & Utilisation (bits)\\ \hline
+	0 & Read/Write partiel & 32 bits &
+	\begin{itemize}
+		\item 15-0: Nombre de données par image
+		\item 31-16: Nombre maximum de données par image (Read only)
+	\end{itemize}\\ \hline
+	1 & Read/Write partiel & 32 bits &
+	\begin{itemize}
+		\item 15-0: Nombre de neurones dans le premier étage
+		\item 31-16: Nombre maximum de neurones dans le premier étage (Read only)
+	\end{itemize}\\ \hline
+	2 & Read/Write partiel & 32 bits &
+	\begin{itemize}
+		\item 15-0: Nombre de neurones dans le second étage
+		\item 31-16: Nombre maximum de neurones dans le second étage (Read only)
+	\end{itemize}\\ \hline
+	3 & Read/Write partiel & 32 bits &
+	Configuration du mode de l'IP :
+	\begin{itemize}
+		\item 3-0: \begin{itemize}
+				\item \verb+0000+: inactif
+				\item \verb+0001+: Calcul du réseau de neurones
+				\item \verb+0010+: Chargement des poids pour le premier niveau de neurones
+				\item \verb+0100+: Chargement des poids pour l'étage de recodage
+				\item \verb+1000+: Chargement des poids pour le second niveau de neurones
+				\end{itemize}
+		\item 08: Reset
+		\item 09: \'{E}tat occupé du maître AXI
+	\end{itemize}\\ \hline
+	4 & Inutilisé & 32 bits & Inutilisé \\ \hline
+	5 & Inutilisé & 32 bits & Inutilisé \\ \hline
+	6 & Read/Write & 32 bits &
+	\begin{itemize}
+		\item 31-00: Nombre de valeurs de sorties du composant à écrire dans la mémoire
+	\end{itemize}\\ \hline
+	7 & Inutilisé & 32 bits & Inutilisé \\ \hline
+	8 & Inutilisé & 32 bits & Inutilisé \\ \hline
+	9 & Inutilisé & 32 bits & Inutilisé \\ \hline
+	10 & Read/Write & 32 bits &
+	\begin{itemize}
+		\item 31-00: Adresse de la mémoire où lire les poids ou données
+	\end{itemize}\\ \hline
+	11 & Read/Write & 32 bits &
+	\begin{itemize}
+		\item 31-00: Adresse de la mémoire où écrire les données de sortie
+	\end{itemize}\\ \hline
+	12 & Read/Write & 32 bits &
+	\begin{itemize}
+		\item 31-00: Nombre de bursts pour la lecture dans la mémoire. La lecture commence quand ce registre est écrit.
+	\end{itemize}\\ \hline
+	13 & Read/Write & 32 bits &
+	\begin{itemize}
+		\item 31-00: Nombre de bursts pour l'écriture dans la mémoire. L'écriture commence quand ce registre est écrit.
+	\end{itemize}\\ \hline
+	14 & Read Only & 32 bits &
+	\begin{itemize}
+		\item 07-00: Nombre de données dans la FIFO entre le premier niveau de neurones et l'étage de recodage.
+		\item 15-08: Nombre de données dans la FIFO entre l'étage de recodage et le second niveau de neurones.
+		\item 23-16: Nombre de données dans la FIFO après le second niveau de neurones.
+	\end{itemize}\\ \hline
+	15 & Read Only & 32 bits &
+	\begin{itemize}
+		\item 31-16: FIFO Ready/Ack signals, in et out: 12 signals
+	\end{itemize}\\ \hline
+\caption{Registres du composant FPGA réseau de neurone}
+\label{fig:user_manual_registers}
+\end{longtable}
