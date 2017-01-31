@@ -120,7 +120,6 @@ sont utiles pour les comparer avec ceux de notre IP et s'assurer que les calculs
 sont justes pour la classification des images MNIST. On s'attend à trouver
 un même taux d'erreur minimal ($11.60\%$) car les configurations sont identiques
 mais un calcul beaucoup plus rapide de toutes les images.
-% TODO: compléter en fonctions des derniers résultats
 
 \subsection{IP du réseau de neurones}
 
@@ -198,7 +197,9 @@ mais un calcul beaucoup plus rapide de toutes les images.
 	(voir figure~\ref{N_calcul} page~\pageref{N_calcul}).
 	
 \subsubsection{La machine à états (FSM) du niveau de neurones}
+
 \subsubsection{Le niveau de neurones}
+%TODO: Hugues
 \subsubsection{L'étage de recodage}
 
 \subsection{Logiciel de commande}
@@ -217,31 +218,95 @@ majeur partie de notre projet car il nous a permis de tester facilement notre
 IP pour des images de petites tailles, des niveaux de neurones avec très peu
 de neurones (3) et de configurer facilement les pixels des images et les poids
 choisis pour connaître les résultats attendus et comparer avec ceux de notre IP.
+Nous avons cependant complété ce code afin qu'il puisse gérer notre IP complète
+avec deux niveaux de neurones et un étage de recodage.
 Par la suite, nous avons repris les mêmes données MNIST que pour le logiciel de
-référence afin de tester une application réelle. \\
-% à finir HUGUES
+référence afin de tester l'application réelle. \\
+\subsubsection{Moyens de communication avec l'IP}
+Pour pouvoir échanger des données entre le logiciel embarqué et notre IP, 16
+registres de 32 bits peuvent être lus et écrits des deux côtés de notre
+système. Par exemple
+les 4 premiers bits de registre 3 contiennent la configuration actuelle de notre
+IP : mode envoi des images, mode configuration (cad chargement des poids) du
+niveau 1, 2 ou de l'étage de recodage. Cette configuration est transmise
+aux blocs concernés afin qu'ils changent leur comportement et attendent les
+données utiles en entrée. Un autre bit de ce registre permet de d'envoyer le
+signal \texttt{RESET} à toute notre IP.
+Les registres sont accédés avec un offset à partir d'une adresse de base
+sur le bus AXI. Des fonctions utilitaires déjà présentes
+permettent de faciliter les accès grâce à des masques et des opérations
+binaires avec les bons registres. \\
+Pour envoyer ou recevoir de plus grosses quantités de données comme l'envoi
+des poids ou des frames, ou récolter les résultats de notre réseau de neurones,
+on utilise la fonction burst de notre bus AXI. On peut alors transférer des
+données de façon rapide entre la DDR où le logiciel alloue de l'espace
+pour stocker poids, frames et résultats et les FIFOs d'entrée et de sortie pour
+communiquer avec notre réseau de neurones. \\
+A chaque fois que l'on souhaite faire un transfert, les mêmes opérations sont
+faites :
+\begin{itemize}
+	\item si c'est une écriture, les données à écrire sont présentes, comme
+		variables globales, dans des tableaux multi-dimensions dans un
+		fichier C
+	\item on alloue un tableau d'entiers (signé pour les poids, non signé
+		pour les frames) de 32 bits de manière dynamique. La taille
+		du tableau alloué dépend des données considérées mais on alloue
+		32 bits (1 case du tableau) par donnée (1 poids, 1 constante ou
+		1 pixel d'une frame) afin de faciliter leur traitement par l'IP,
+		les FIFOs ayant des cases de même taille.
+	\item afin de préparer ce tableau aux bursts, qui sont des transferts
+		par bloc
+		de 16 mots de 32 bits, soit 16 cases du tableau vers une FIFO,
+		on doit aligner son adresse sur des frontières de $16 \times
+		4$ octets. On ajoute alors $16 \times 4$ comme supplément à la
+		taille nécessaire du tableau et on incrémente l'adresse
+		renvoyée par \texttt{malloc} jusqu'à trouver une frontière de
+		$16 \times 4$ octets, cad une adresse terminant par
+		\texttt{0x00}, \texttt{0x40}, \texttt{0x80} ou \texttt{0xC0}.
+		Grâce au supplément dans la taille ajouté, on est sûr d'avoir
+		suffisament de place pour écrire les données même après avoir
+		incrémenté l'adresse pour l'arrondir.
+	\item on écrit les données dans le tableau alloué à partir des
+		variables globales déjà présentes
+	\item on passe l'adresse de ce tableau à l'IP par un registre
+	\item on indique dans un autre registre le nombre de bursts nécessaires
+		pour transférer tout le tableau vers la FIFO. Si le tableau n'a
+		pas un nombre de case qui est multiple de 16, on fait un burst
+		supplémentaire pour inclure le reste. Il faudra alors
+		envoyer à l'IP un signal \texttt{RESET} entre deux écritures
+		afin de vider les FIFOs de leurs données résiduelles invalides.
+\end{itemize}
+% TODO: inclure schéma général qui résume ces transactions
+\subsubsection{Débogage}
+% problèmes uniquement liés au soft : printf et GDB
+% (allocation et remplissage des tableaux)
+Pour déboguer le système global, notre IP avec le logiciel embarqué nous avons
+utilisé différentes manières. \\
+Pour des problèmes uniquement liés au logiciel (mauvaise taille, mauvais indices
+des tableaux, ...),
+nous avons utilisé le composant
+UART avec la fonction Xilinx \texttt{printf} pour envoyer par le lien série des
+informations sur un terminal distant. En passant par la suite à la carte ZedBoard,
+nous avons pu faire fonctionner la fonction Debug sur SDK Xilinx pour pouvoir
+avancer pas à pas dans le code et inspecter l'état des variables. \\
+% problèmes de l'IP :
+% informations contenues dans certains registres
+Les problèmes liés à notre IP sont plus difficiles à déboguer car nous ne pouvons
+pas simuler le système complet à cause de licences manquantes. Pour repérer
+certains problèmes comme des boucles d'attente infinies, des données de
+notre IP sont écrites dans des registres comme les signaux \texttt{READY} et
+\texttt{ACK} de chacunes des FIFOs et les \texttt{COUNT} pour ces FIFOs. Des
+fonctions utilitaires permettent de lire facilement ces informations à partir
+des registres concernés et de nous renseigner plus précisément sur quel est
+l'étage bloquant de notre système. \\
+% fonctions pour poper des valeurs en cours de route
+Cependant ces méthodes ne peuvent nous renseigner uniquement sur l'étage qui
+fait bloquer tout le système et non pas sur la validité des données produites
+en sortie de chaque étage.
 
 \subsection{Caractéristiques finales du système implanté}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+% Donner ici les performances du système ?
+% Comparer avec le logiciel de référence
+% Comparer avec, en théorie, les performances maximales que l'on pourrait
+% avoir en HW
 

@@ -1,0 +1,13 @@
+digraph finite_state_machine {
+	rankdir=LR;
+	size="8,5"
+	node [shape = circle];
+	SHIFT_MODE -> SHIFT_MODE [ label = "" ];
+	SHIFT_MODE -> SHIFT_CPY [ label = "flag_mirror_chain=1" ];
+	SHIFT_CPY -> WAIT_SHIFT_CPY [ label = "flag_mirror_chain=1" ];
+	WAIT_SHIFT_CPY -> SHIFT [ label = "sensor_copy=1" ];
+	WAIT_SHIFT_CPY -> WAIT_SHIFT_CPY [ label = "" ];
+	SHIFT -> SHIFT_MODE [ label = "current_shift_counter=NB_NEURONS-1" ];
+	SHIFT -> SHIFT [ label = "out_fifo_in_count > MIN_OUT_FIFO_IN_CNT + OUT_FIFO_MARGIN => ENVOI || !ENVOI" ];
+}
+

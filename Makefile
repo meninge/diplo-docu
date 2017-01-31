@@ -7,5 +7,5 @@ compile:
 open:
 	open main.pdf
 clean:
-	-rm *.log *.nlo *.toc *.aux *.bbl *.blg *.fdb_latexmk *.fls *.ilg *.nls
-	-rm main.synctex.gz	
+	-rm *.log *.nlo *.toc *.aux *.bbl *.blg *.fdb_latexmk *.fls *.ilg *.nls *.out
+	-rm main.synctex.gz
