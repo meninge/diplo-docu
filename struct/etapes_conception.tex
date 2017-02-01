@@ -11,7 +11,9 @@ faits a propos de leur architecture.
 % du taux d'erreur.
 Le programme de référence implémente le même réseau de neurone que notre IP
 mais directement en C. On peut ainsi l'executer sur un PC ou un micro-processeur 
-et comparer les résultats avec l'implémentation réelle sur FPGA.
+et comparer les résultats avec l'implémentation réelle sur FPGA. On comparera
+la valeur des résultats de sortie et le temps d'exécution entre software et
+hardware.
 
 \subsubsection{L'algorithme}
 
@@ -30,6 +32,10 @@ et comparer les résultats avec l'implémentation réelle sur FPGA.
 		\For {$n \leftarrow 0$ \KwTo $neurons$} {
 			$out1[n] \leftarrow \texttt{cut(}out1[n]\texttt{)}$\;
 			$out1[n] \leftarrow out1[n] + b1[n]$\;
+			\If {$out1[n] < 0$} {
+				$out1[n] \leftarrow 0$\;
+			}
+			$out1[n] \leftarrow \texttt{cut(}out1[n]\texttt{)}$\;
 		}
 		\For {$n \leftarrow 0$ \KwTo $neurons$} {
 			\For {$i \leftarrow 0$ \KwTo $9$} {
@@ -39,6 +45,7 @@ et comparer les résultats avec l'implémentation réelle sur FPGA.
 		\For {$i \leftarrow 0$ \KwTo $9$} {
 			$out2[n] \leftarrow \texttt{cut(}out2[n]\texttt{)}$\;
 			$out2[n] \leftarrow out2[n] + b2[n]$\;
+			$out2[n] \leftarrow \texttt{cut(}out2[n]\texttt{)}$\;
 		}
 		$\texttt{assert(max(}out2\texttt{)} == \texttt{get\_label(}f\texttt{))}$\;
 	}
@@ -62,35 +69,36 @@ au numéro du neurone de sortie qui a la plus grande valeur. \\
 Dans ce modèle logiciel, les pixels sont encodés sur un octet, les poids et les
 constantes sont sur 2 octets. Afin que dans le pire cas, aucune information ne
 soit perdue lors de l'accumulation aux différents étages, on réalise cette opération sur
-8 octets. Cependant, on ne doit en sélectionner que 2 sur les 8 pour effectuer l'ajout de la constante
-sur des nombres de même taille et envoyer ce résultat au deuxième niveau. C'est
-le rôle de la fonction \texttt{cut} qui permet de passer de 64 à 16 bits tout
-en conservant le signe. Afin de choisir le bon masque, nous avons effectué
-plusieurs essais et gardé celui qui menait au plus bas taux d'erreur (table
+8 octets. Cependant, afin que le logiciel de référence reproduise le même
+comportement que notre IP, on ne peut faire transiter entre deux étages uniquement
+des données sur 4 octets. C'est
+le rôle de la fonction \texttt{cut} qui permet de passer de 64 à 32 bits tout
+en conservant le signe.
+Notre IP garde uniquement les 32 bits de poids faible de ce mot de 64 bits,
+cependant des essais en software pour 100 et 200 neurones ont permis de découvrir
+des meilleurs masques qui augmentaient le taux de succès jusqu'à $0.5\%$
+(table
 \ref{fig:masques} page~\pageref{fig:masques}).
 
 \begin{table}[h!]
 \centering
-	\begin{tabular}{| l | l |}
+	\begin{tabular}{| l | l | l |}
 	\hline
-	Masque & Taux d'erreur \\ \hline
-	0xFFFF0000 & 91.30 \\ \hline
-	0x0FFFF000 & 91.30 \\ \hline
-	0x03FFFC00 & 83.10 \\ \hline
-	0x01FFFE00 & 28.80 \\ \hline
-	0x00FFFF00 & 11.60 \\ \hline
-	0x007FFF80 & 16.30 \\ \hline
-	0x000FFFF0 & 90.70 \\ \hline
+	Masque & Taux de succès (100 neurones) & Taux de succès (200 neurones)\\ \hline
+	\texttt{0x00000000FFFFFFFF} & 93.8 & 94.4 \\ \hline
+	\texttt{0x00000007FFFFFFF8} & 93.9 & 94.5 \\ \hline
+	\texttt{0x0000000FFFFFFFF0} & 93.9 & 94.7 \\ \hline
+	\texttt{0x0000001FFFFFFFE0} & 94.3 & 94.8 \\ \hline
+	\texttt{0x0000003FFFFFFFC0} & 79.4 & 89.4 \\ \hline
+	\texttt{0x000000FFFFFFFF00} & 8.5  & 8.5  \\ \hline
 	\end{tabular}
 	\caption{Essais de différents masques et leur taux d'erreur}
 	\label{fig:masques}
 \end{table}
 
-Ainsi, nous masquons les résultats du premier niveau avec le masque sur 64 bits
-\texttt{0x00FFFF00} (les bits de poids fort ne sont pas représentés ici) puis
-nous effectuons un décalage pour garder uniquement ces bits, de 8 à 23. Ce
-résultat nous a aussi aidé à effectuer le même masque et décalage dans notre
-réseau de neurones matériel.
+En choisissant un autre masque que
+\texttt{0x00000000FFFFFFFF}
+il est nécessaire d'effectuer un décalage à droite ensuite.
 
 \subsubsection{Mise en forme des données MNIST}
 
@@ -118,8 +126,10 @@ facilement ces informations depuis le logiciel.
 Les résultats du logiciel de référence en sortie de chacun des niveaux nous
 sont utiles pour les comparer avec ceux de notre IP et s'assurer que les calculs
 sont justes pour la classification des images MNIST. On s'attend à trouver
-un même taux d'erreur minimal ($11.60\%$) car les configurations sont identiques
+un même taux d'erreur ($93.80\%$) car les configurations sont identiques
 mais un calcul beaucoup plus rapide de toutes les images.
+
+
 
 \subsection{IP du réseau de neurones}
 
@@ -170,37 +180,204 @@ mais un calcul beaucoup plus rapide de toutes les images.
 			\label{fig:N_calcul}
 		\end{center}
 	\end{figure}
-	
-	Le mode de calcul est le mode principal d'un neurone. C'est dans ce mode que le neurone 
-	reçoit des données et qu'il effectue une succession de multiplication à accumulation entrée 
-	la valeur du pixel reçu et le poids correspondant à l'adresse qui lui est donné. L'opération clé 
+
+	Le mode de calcul est le mode principal d'un neurone. C'est dans ce mode que le neurone
+	reçoit des données et qu'il effectue une succession de multiplication à accumulation entrée
+	la valeur du pixel reçu et le poids correspondant à l'adresse qui lui est donné. L'opération clé
 	d'un neurone peut être écrite comme :
 	$$\sum_{adr=0}^n p_{adr}*d$$
-	avec $n$ données entrantes dans le réseau, $p_{adr}$ le poids à l'adresse $adr$ 
-	et $d$ la données entrante. 
+	avec $n$ données entrantes dans le réseau, $p_{adr}$ le poids à l'adresse $adr$
+	et $d$ la données entrante.
 
 	En effectuant cette opération sur chaque pixel d'une image, un neurone du premier niveau du réseau
-	est capable de produire un résultat par image. Les neurones des niveaux suivant ne reçoivent 
-	pas des pixels mais les résultats du niveaux précédent et opère de la même façon pour enfin 
+	est capable de produire un résultat par image. Les neurones des niveaux suivant ne reçoivent
+	pas des pixels mais les résultats du niveaux précédent et opère de la même façon pour enfin
 	produire chacun un résultat (voir figure~\ref{N_calcul} page~\pageref{N_calcul}).
-	\\{\em Notez qu'entre deux niveaux les résultats passent par l'étage de recode 
+	\\{\em Notez qu'entre deux niveaux les résultats passent par l'étage de recode
 	(cf. Partie 3.2.5 "Le niveau de neurones")}.
-	
-	Une fois que chaque neurone à produit son résultat, ils vont en faire une copie dans 
-	un registre appelé {\em miroir} et remettre le registre d'accumulation à 0. Ainsi, 
-	le calcul de l'image suivante pourra être commancé alors que résultat de l'image précédente 
-	sera évacué vers la FIFO de sortie suivante. Pour ce faire, à la réception du signal 
-	{\em sauver accu dans miroir}, chaque neurones va faire passer la valeur de son 
+
+	Une fois que chaque neurone à produit son résultat, ils vont en faire une copie dans
+	un registre appelé {\em miroir} et remettre le registre d'accumulation à 0. Ainsi,
+	le calcul de l'image suivante pourra être commancé alors que résultat de l'image précédente
+	sera évacué vers la FIFO de sortie suivante. Pour ce faire, à la réception du signal
+	{\em sauver accu dans miroir}, chaque neurones va faire passer la valeur de son
 	registre miroir au neurone suivant et récupérer la valeur du neurone précédant.
-	Cela permet de ne connecter qu'un neurone à la FIFO 
-	et de faire évacuer les données les unes après les autres dans la FIFO 
+	Cela permet de ne connecter qu'un neurone à la FIFO
+	et de faire évacuer les données les unes après les autres dans la FIFO
 	(voir figure~\ref{N_calcul} page~\pageref{N_calcul}).
-	
+
 \subsubsection{La machine à états (FSM) du niveau de neurones}
 
+La machine à états ou FSM (Finite State Machine) contrôle l'ensemble des neurones
+d'un niveau de neurones.
+Elle a été conçue de façon à contrôler un nombre de neurones indéfini : qu'il y
+ait 1 ou 100000 de neurones, la machine à états reste la même.
+
+Les signaux de contrôle de la FSM sont reliés à tous les neurones.
+
+Pour des raisons de simplicité le contrôle des neurones est séparé en deux
+machines à états qui communiquent entre elles par le biais d'un drapeau.
+
+\paragraph{La machine à états de contrôle des neurones}
+
+L'ensemble de cette machine à états est visible dans la
+figure~\ref{fig:fsm}~page~\pageref{fig:fsm}.
+
+Dans le mode accumulation,
+il n'y a pas besoin de distinguer chaque neurone, on se contente donc d'envoyer
+les signaux de contrôle à tous les neurones.
+Dans le mode chargement des poids de neurones, il faut être capable de commander
+un neurone à la fois. Pour cela, la FSM génère un token de configuration au début
+de la phase de chargement des poids et le donne au premier neurone. Sans ce token,
+le neurone est inactif dans cette phase. La machine à états, une fois fini de
+charger les poids d'un neurone, déclenche un décalage du token de configuration
+entre les neurones. Une fois le dernier neurone atteint, le décalage du token
+le renvoie sur la FSM qui sait donc qu'elle a fini de configurer l'ensemble des
+neurones.
+
+\begin{sidewaysfigure}
+	\includegraphics[width=\textwidth]{fsm}
+	\caption{Machine à états de contrôle des neurones}
+	\label{fig:fsm}
+\end{sidewaysfigure}
+
+Voici de courtes explications pour les différents états:
+\begin{itemize}
+	\item \verb+RESET_STATE+: état de reset
+	\item \verb+FSM_MODE+: choix du mode de fonctionnement du niveau de
+		neurones, soit chargement des poids, soit accumulation.
+	\item \verb+MODE_ACC+: on est en mode accumulation, on le signale aux
+		neurones, et on attend qu'ils aient pris en compte le changement.
+	\item \verb+WAIT_1D+: on attend que la première donnée soit présente
+		dans la FIFO d'entrée pour commencer l'accumulation.
+	\item \verb+SEND_DATA+: accumulation des neurones. Si jamais on a atteint
+		la fin d'une image on le notifie à la machine à états de la
+		chaîne de miroir, sinon on attend une nouvelle donnée.
+	\item \verb+WAIT_DATA+: on attend une nouvelle donnée
+	\item \verb+END_ACC+: on a fini l'accumulation sur une image, on retourne
+		dans l'état de choix de mode de la FSM.
+	\item \verb+MODE_WEIGHT+: on est en mode chargement des poids, on le signale aux
+		neurones, et on attend qu'ils aient pris en compte le changement.
+	\item \verb+NOTIFY_1N+: on passe le token de configuration au premier neurone
+		et on attend qu'il nous confirme sa réception.
+	\item \verb+SEND_WEIGHT+: chargement du poids dans la mémoire du neurone.
+		Si jamais on a atteint la fin d'un neurone, on décale le token
+		de configuration, sinon on attend un nouveau poids.
+	\item \verb+WAIT_WEIGHT+: on attend un nouveau poids.
+	\item \verb+SHIFT_NOTIFY+: on décale le token de configuration.
+	\item \verb+WAIT_NOTIFY+: on attend que les neurones aient bien décalé
+		le token de configuration, si jamais la FSM le reçoit cela signifie
+		que l'on a configuré tous les neurones, dans ce cas on passe en
+		fin de configuration, sinon on continue de configurer les neurones suivants.
+	\item \verb+END_CONFIG+: on a fini le chargement des poids, on retourne
+		dans l'état de choix de mode de la FSM.
+\end{itemize}
+
+
+\paragraph{La machine à états de la chaîne de miroirs}
+
+L'ensemble de cette machine à états est visible dans la
+figure~\ref{fig:fsm_miroir}~page~\pageref{fig:fsm_miroir}.
+Elle est chargée de décaler les miroirs de la chaîne de miroirs des neurones
+pour les transmettre à la FIFO de sortie.
+
+\begin{figure}[h!]
+	\includegraphics[width=\textwidth]{fsm_miroir}
+	\caption{Machine à états de la chaîne de miroir}
+	\label{fig:fsm_miroir}
+\end{figure}
+
+Voici de courtes explications pour les différents états:
+\begin{itemize}
+	\item \verb+SHIFT_MODE+: état d'attente, si la FSM de contrôle des neurones
+		passe le drapeau de communication à 1, il faut commencer à décaler
+		la chaîne de miroir.
+	\item \verb+SHIFT_CPY+: copie de la valeur des registres d'accumulation
+		de chaque neurone dans leur miroir respectif.
+	\item \verb+WAIT_SHIFT_CPY+: on attend que les neurones aient copiés leur
+		registre dans le miroir.
+	\item \verb+SHIFT+: on décale les miroirs de chaque neurone dans le neurone suivant
+		uniquement s'il y a suffisamment de place dans la FIFO de sortie. On prend en compte
+		le temps de propagation des signaux de contrôle pour qu'il n'y ait pas de donnée perdues
+		à cause d'un manque de place dans la FIFO de sortie.
+\end{itemize}
+
+
 \subsubsection{Le niveau de neurones}
-%TODO: Hugues
+% TODO: inclure la figure en question
+Le niveau de neurones est l'entité de notre IP qui regroupe un certain nombre
+de neurones (100 ou 200 pour le premier niveau, 10 pour le deuxième) et une
+machine à états afin de les contrôler. \\
+Afin de pouvoir relier les signaux de contrôle de la machine à états à plus de
+100 ou 200 neurones et tous leurs ports d'entrée, de simples fils auraient posés
+problème. En effet pour deux neurones très éloignés dans le routage, les temps
+de propagation des données envoyées en même temps de la FSM n'auraient pas été
+identiques et cela aurait crée des problèmes de synchronisation. Pour cela, nous
+avons utilisé des buffers de distribution, déjà disponible, pour distribuer les
+signaux de contrôle de la FSM à tous les neurones. Ils implémentent un arbre
+de fils avec la racine connectée à un port de sortie de la FSM et les feuilles
+connectées à tous les neurones. Le nombre de fils fils de chaque noeud est un
+% TODO: ajouter la ref de la figure mentionée ci-dessus
+paramètre du distribuf (2 dans la figure .. page ..) et le passage d'un niveau
+du distribuf prend un cycle. On est alors assuré que la donnée arrivera en même
+temps à tous les neurones. \\
+Certains signaux se connectent uniquement au premier ou au dernier des neurones
+et d'autres entre deux neurones consécutifs. Pour gérer ces connexions
+exceptionnelles on instancie tous les neurones grâce à la boucle VHDL :\\
+\texttt{gen\_neu: for i in 0 to NBNEU-1 generate} \\
+où chacun des ports des neurones sont reliés à des tableaux de signaux pour
+faciliter leur utilisation.
+
+% distribufs : pourquoi sont-ils utilisés au lieu de simples fils ?
+% éloignement des unités, même fanout, pour les signaux qui vont à chaque neurones
+% même nombre de fils
+% fils simples de contrôle pour chaque neurone, connection de tous les composants
 \subsubsection{L'étage de recodage}
+
+Situé après le niveau de neurones, l'étage de recodage possède deux fonctions :
+ajouter une constante aux valeurs sortants du niveau de neurones (chaque
+constante est propre à un neurone) et
+supprimer les valeurs négatives après ajout de constante.
+
+Elle est contrôlée par une machine à états visible sur la
+figure~\ref{fig:recode_fsm}~page~\pageref{fig:recode_fsm}.
+
+\begin{figure}[h!]
+	\includegraphics[width=\textwidth]{recode_fsm}
+	\caption{Machine à états de l'étage de recodage}
+	\label{fig:recode_fsm}
+\end{figure}
+
+Voici de courtes explications pour les différents états:
+\begin{itemize}
+	\item \verb+RESET+: état de choix de mode et d'attente de données présentes.
+		Si le mode est le traitement classique et qu'il y a une donnée
+		disponible dans la FIFO d'entrée, on passe dans l'état de traitement
+		des données. Si il s'agit du mode de chargement des poids
+		et qu'il y a un poids disponible dans la FIFO d'entrée, on passe dans l'état
+		de chargement des poids.
+	\item \verb+WRITE_INPUT+: on écrit le poids dans la mémoire,
+		si on a atteint la fin de la mémoire, on repasse dans l'état \verb+RESET+,
+		s'il y a une donnée
+		disponible ensuite on continue d'écrire les poinds dans la mémoire,
+		sinon on attend qu'il y ait un poids disponible.
+	\item \verb+WRITE_WAIT+: on attend qu'il y ait un poids disponible.
+	\item \verb+DATA+: on effectue le traitement de la donnée en entrée seulement si:
+		elle est disponible, il y a de place dans la FIFO de sortie et on a pas atteint
+		la fin de la totalité des données sortant d'un décalage complet de la chaîne
+		de miroirs. Le traitement consiste à ajouter une constante, et supprimer la valeur
+		(envoyer 0 en sortie) si la valeur après ajout de constante est négative, sinon on
+		envoie la valeur avec l'ajout de constante.
+		S'il n'y a pas de place en sortie ou pas de donnée en entrée, on attend que les deux conditions
+		soient valides.
+		Si on a atteint la fin d'un décalage complet de la chaîne de miroirs, on repasse dans
+		l'état de \verb+RESET+.
+\end{itemize}
+
+
+
+\subsubsection{Le pipeline complet}
+%TODO: Lucas
 
 \subsection{Logiciel de commande}
 Le logiciel de commande est le logiciel embarqué sur la carte, qui s'execute
@@ -302,11 +479,88 @@ l'étage bloquant de notre système. \\
 % fonctions pour poper des valeurs en cours de route
 Cependant ces méthodes ne peuvent nous renseigner uniquement sur l'étage qui
 fait bloquer tout le système et non pas sur la validité des données produites
-en sortie de chaque étage.
+en sortie de chaque étage. Une fonctionnalité pour sortir des données de chacune
+des FIFOs intermédiaires a alors été implémentée du côté hardware, active à la
+lecture d'un certain registre, qui n'était jusque là pas utilisé. La gestion
+côté software est correctement effectuée pour attendre qu'il y des données dans
+les FIFOs avant de les sortir. Ce mécanisme nous a permis d'isoler les différents
+bugs de notre IP à un étage et de pouvoir les corriger individuellement.
 
 \subsection{Caractéristiques finales du système implanté}
-% Donner ici les performances du système ?
-% Comparer avec le logiciel de référence
-% Comparer avec, en théorie, les performances maximales que l'on pourrait
-% avoir en HW
+Pour étudier les caractéristiques finales de notre système, il est important
+de définir les caractéristiques théoriques atteignables.
 
+\paragraph{Caractéristiques théoriques\\}
+
+On suppose qu'il n'y a pas de blocage de données en sortie de notre
+composant et que des données sont toujours disponibles en entrée.
+
+Ainsi, il faut $2\times FSIZE$ cycles (où $FSIZE$ est la taille d'une image)
+pour accumuler les données dans le premier
+niveau de neurones. Puis pour accumuler dans le deuxième niveau, il faut
+$2\times N_1$ cycles (où $N_1$ est le nombre de neurones dans le premier niveau de
+neurones).
+
+De plus, pour décaler les données du premier niveau jusqu'au deuxième
+niveau, il faut N1 cycles pour décaler les données dans la FIFO, puis trois cycles
+pour que la première donnée traverse les FIFOs et l'étage de recodage, les données
+qui suivront n'auront pas de latence. Ainsi Entre le premier niveau de neurones
+et le deuxième, il y a $N_1 + 3$ cycles.
+Mais le deuxième niveau de neurones va être bloquant (car $2\times N_1 > N_1 +3$
+pour $N_1 > 2$). Donc pour que les données soient décalées du premier
+niveau de neurones et accumulées par le deuxième, il faut $2\times N_1$ cycles.
+
+Après le deuxième niveau de neurones, il faut $N_2$ cycles (où $N_2$
+est le nombre de neurones dans le deuxième niveau) pour décaler les données.
+
+Ainsi le nombre de cycles requis pour traiter une image est:
+\begin{equation}
+	N_{calcul} = N_1 \times 2 + FSIZE \times 2 + N_2
+\end{equation}
+
+Donc le temps de calcul d'une image est:
+\begin{equation}
+	T_{calcul} = N_{calcul}/f_{réseau\_de\_neurones} 
+\end{equation}
+
+
+\paragraph{\'{E}valuation des performances\\}
+
+Il s'agit maintenant de comparer les performances (en théorie et en pratique)
+aux performances du logiciel de référence fonctionnant sur le processeur embarqué.\\
+
+Pour $FSIZE = 784$, $N_1 = 100$ et $N_2 = 10$, les performances sont disponibles
+dans le tableau~\ref{fig:perf_100}~page~\pageref{fig:perf_100}.
+Dans ce cas-là, le facteur d'accélération vaut $t_{logiciel}/t_{IP (pratique)} = 457$.\\
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{| p{0.15\textwidth} | p{0.10\textwidth} | p{0.2\textwidth} | p{0.2\textwidth} | p{0.15\textwidth} |}
+		\hline
+		Entité & fréquence (MHz) & Taux de réussite pour 1000 images (MNIST) & Temps de calcul pour 1000 images (secondes) & nombre d'images par secondes\\
+		\hline
+		Logiciel de référence & 667 & 93.80\% &  8.67455 & 115.28\\
+		IP (Théorie) & 115 &  93.80\% & 0.0154608 & 64679.4\\
+		IP (Pratique) & 115 &  93.80\% & 0.0189669 & 52726.3\\
+		\hline
+	\end{tabular}
+	\caption{Performances pour $FSIZE = 784$, $N_1 = 100$ et $N_2 = 10$}
+	\label{fig:perf_100}
+\end{table}
+
+Pour $FSIZE = 784$, $N_1 = 200$ et $N_2 = 10$, les performances sont disponibles
+dans le tableau~\ref{fig:perf_200}~page~\pageref{fig:perf_200}.
+Dans ce cas-là, le facteur d'accélération vaut $t_{logiciel}/t_{IP (pratique)} = ???$.\\
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{| p{0.15\textwidth} | p{0.10\textwidth} | p{0.2\textwidth} | p{0.2\textwidth} | p{0.15\textwidth} |}
+	\hline
+	Entité & fréquence (MHz) & Taux de réussite pour 1000 images (MNIST) & Temps de calcul pour 1000 images (secondes) & nombre d'images par secondes\\
+	\hline
+	Logiciel de référence & 667 & 93.80\% & A CALCULER & A CALCULER\\
+	IP (Théorie) & 110 & 93.80\% & 0.0179818 & 55611.7\\
+	IP (Pratique) & 110 & 93.80\% & A CALCULER & A CALCULER\\
+	\hline
+\end{tabular}
+\caption{Performances pour $FSIZE = 784$, $N_1 = 200$ et $N_2 = 10$}
+\label{fig:perf_200}
+\end{table}
