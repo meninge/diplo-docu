@@ -493,7 +493,7 @@ bugs de notre IP à un étage et de pouvoir les corriger individuellement.
 Pour étudier les caractéristiques finales de notre système, il est important
 de définir les caractéristiques théoriques atteignables.
 
-\paragraph{Caractéristiques théoriques\\}
+\subsubsection{Caractéristiques théoriques}
 
 On suppose qu'il n'y a pas de blocage de données en sortie de notre
 composant et que des données sont toujours disponibles en entrée.
@@ -538,15 +538,33 @@ Et
 	T_{calcul\_optimal} = N_{calcul}/f_{réseau\_de\_neurones}
 \end{equation}
 
-Malheureusement, nous avons manque de temps pour optimiser cette machine à états
+Malheureusement, nous avons manqué de temps pour optimiser cette machine à états
 et valider que l'IP fonctionnait encore après optimisation.
 
-\paragraph{Implantation sur carte Zedboard\\}
+\subsubsection{Implantation sur carte Zedboard}
 
-TODO: parler de l'IP générée sur Zedboard, \%DSP et \%BRAM notamment.
+Avec l'outil {\em Xilinx Vivado}, nous avons implanté sur la carte Zedboard notre IP.
+La Zedboard dispose de 220 cellules DSP (utilisées pour l'accumulation dans les neurones).
+
+Après implantation de l'IP pour 100 neurones dans le premier niveau et 10 dans le deuxième,
+à une fréquence de 115 MHz, nous obtenons, les caractéristiques suivantes :
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{|c|c|c|c|}
+		\hline
+		Catégorie & Utilisées & Total & Taux d'utilisation\\
+		\hline
+		Cellules LUTs & 4197 & 53200 & 7.89\% \\
+		Mémoires LUTs & 282 & 17400 & 1.62\% \\
+		Mémoires BRAMs & 55.5 & 140 & 39.64\% \\
+		Cellules DSPs & 110 & 220 & 50\% \\
+		\hline
+	\end{tabular}
+\end{table}
 
 
-\paragraph{\'{E}valuation des performances\\}
+\subsubsection{\'{E}valuation des performances}
 
 Il s'agit maintenant de comparer les performances (en théorie et en pratique)
 aux performances du logiciel de référence fonctionnant sur le processeur embarqué.\\
@@ -567,22 +585,4 @@ Dans ce cas-là, le facteur d'accélération vaut $t_{logiciel}/t_{IP (pratique)
 	\end{tabular}
 	\caption{Performances pour $FSIZE = 784$, $N_1 = 100$ et $N_2 = 10$}
 	\label{fig:perf_100}
-\end{table}
-
-Pour $FSIZE = 784$, $N_1 = 200$ et $N_2 = 10$, les performances sont disponibles
-dans le tableau~\ref{fig:perf_200}~page~\pageref{fig:perf_200}.
-Dans ce cas-là, le facteur d'accélération vaut $t_{logiciel}/t_{IP (pratique)} = ???$.\\
-\begin{table}[h!]
-	\centering
-	\begin{tabular}{| p{0.15\textwidth} | p{0.10\textwidth} | p{0.2\textwidth} | p{0.2\textwidth} | p{0.15\textwidth} |}
-	\hline
-	Entité & fréquence (MHz) & Taux de réussite pour 1000 images (MNIST) & Temps de calcul pour 1000 images (secondes) & nombre d'images par secondes\\
-	\hline
-	Logiciel de référence & 667 & 93.80\% & A CALCULER & A CALCULER\\
-	IP (Théorie) & 110 & 93.80\% & 0.0179818 & 55611.7\\
-	IP (Pratique) & 110 & 93.80\% & A CALCULER & A CALCULER\\
-	\hline
-\end{tabular}
-\caption{Performances pour $FSIZE = 784$, $N_1 = 200$ et $N_2 = 10$}
-\label{fig:perf_200}
 \end{table}
