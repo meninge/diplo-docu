@@ -173,7 +173,7 @@ mais un calcul beaucoup plus rapide de toutes les images.
 	\end{figure}
 	
 	Le mode de calcul est le mode principal d'un neurone. C'est dans ce mode que le neurone 
-	reçoit des données et qu'il effectue une succession de multiplication à accumulation entrée 
+	reçoit des données et qu'il effectue une succession de multiplication à accumulation entre 
 	la valeur du pixel reçu et le poids correspondant à l'adresse qui lui est donné. L'opération clé 
 	d'un neurone peut être écrite comme :
 	$$\sum_{adr=0}^n p_{adr}*d$$
@@ -183,23 +183,25 @@ mais un calcul beaucoup plus rapide de toutes les images.
 	En effectuant cette opération sur chaque pixel d'une image, un neurone du premier niveau du réseau
 	est capable de produire un résultat par image. Les neurones des niveaux suivant ne reçoivent 
 	pas des pixels mais les résultats du niveaux précédent et opère de la même façon pour enfin 
-	produire chacun un résultat (voir figure~\ref{N_calcul} page~\pageref{N_calcul}).
+	produire chacun un résultat (voir figure~\ref{fig:N_calcul} page~\pageref{fig:N_calcul}).
 	\\{\em Notez qu'entre deux niveaux les résultats passent par l'étage de recode 
-	(cf. Partie 3.2.5 "Le niveau de neurones")}.
+	(cf. Partie~\ref{plan:recode} "L'étage de recodage")}.
 	
 	Une fois que chaque neurone à produit son résultat, ils vont en faire une copie dans 
-	un registre appelé {\em miroir} et remettre le registre d'accumulation à 0. Ainsi, 
-	le calcul de l'image suivante pourra être commancé alors que résultat de l'image précédente 
+	un registre appelé {\em miroir} (au signal de {\em faire copie de accu dans miroir}) 
+	et remettre le registre d'accumulation à 0. Ainsi, le calcul de l'image suivante pourra 
+	être commencé alors que résultat de l'image précédente 
 	sera évacué vers la FIFO de sortie suivante. Pour ce faire, à la réception du signal 
-	{\em sauver accu dans miroir}, chaque neurones va faire passer la valeur de son 
-	registre miroir au neurone suivant et récupérer la valeur du neurone précédant.
-	Cela permet de ne connecter qu'un neurone à la FIFO 
-	et de faire évacuer les données les unes après les autres dans la FIFO 
-	(voir figure~\ref{N_calcul} page~\pageref{N_calcul}).
+	{\em faire passer le miroir}, chaque neurones va faire passer la valeur de son 
+	registre miroir au neurone suivant et récupérer la valeur du miroir du neurone précédant.
+	Cela permet de ne connecter qu'un neurone à la FIFO de sortie 
+	et de faire évacuer les données les unes après les autres dans cette FIFO 
+	(voir figure~\ref{fig:N_calcul} page~\pageref{fig:N_calcul}).
 	
 \subsubsection{La machine à états (FSM) du niveau de neurones}
 \subsubsection{Le niveau de neurones}
 \subsubsection{L'étage de recodage}
+\label{plan:recode}
 
 \subsection{Logiciel de commande}
 Le logiciel de commande est le logiciel embarqué sur la carte, qui s'execute
