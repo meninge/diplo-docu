@@ -1,5 +1,3 @@
-%TODO : améliorer la description des test benchs de simulation.
-
 La validation est une partie importante de notre projet. En effet, elle permet
 d'assurer le bon fonctionnement de notre IP.
 
@@ -18,10 +16,19 @@ composants.
 Les simulations ont été réalisé à l'aide du simulateur de Xilinx Vivado.
 
 \subsubsection{Le neurone}
-
-%TODO: LUCAS
-%TODO: à compléter
-TODO: LUCAS
+Pour tester le neurone, il faut que le bench de test simule l'environnement dans lequel
+le neurone doit évoluer. C'est-à-dire, les interaction avec les autres neurones, 
+la machine à états et les FIFO de données en entrée et en sortie. 
+Ainsi dans le bench de test du neurone, nous avons vérifier que le neurone :
+\begin{itemize}
+	\item puisse écrire dans sa BRAM lorsqu'il est en mode chargement des poids.
+	\item puisse lire les coefficients en BRAM quand il est en mode accumulation.
+	\item réagisse bien à la demande du passage de token.
+	\item fasse bien les bons calculs.
+	\item copie bien leur registre d'accumulation dans le registre miroir.
+	\item évacue bien la donnée du miroir par la chaine de miroir. 
+	\item interagisse bien avec les signaux de contrôle des FIFO en lecture et en écriture. 
+\end{itemize} 
 
 \subsubsection{La machine à états}
 
