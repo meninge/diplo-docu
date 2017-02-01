@@ -3,13 +3,13 @@
 
 Nous allons présenter dans cette partie les principales étapes de conception
 de notre réseau de neurones en détaillant tous les blocs réalisés et les choix
-faits a propos de leur architecture.
+faits à propos de leur architecture.
 
 \subsection{Programme de référence}
 % Description du programme de référence en C, de l'utilisation de la base
 % de données MNIST, du script en Python, des tableaux contenant les données,
 % du taux d'erreur.
-Le programme de référence implémente le même réseau de neurone que notre IP
+Le programme de référence implémente le même réseau de neurones que notre IP
 mais directement en C. On peut ainsi l'executer sur un PC ou un micro-processeur 
 et comparer les résultats avec l'implémentation réelle sur FPGA. On comparera
 la valeur des résultats de sortie et le temps d'exécution entre software et
@@ -143,26 +143,26 @@ mais un calcul beaucoup plus rapide de toutes les images.
 
 \subsubsection{Le neurone}
 	Le neurones est l'élément de base de notre réseau.
-	C'est donc la première chose que nous avons implémenter.
+	C'est donc la première chose que nous avons implémenté.
 	Pour faire cela, nous avons pensé le neurone en terme de
 	fonctionnalités uniquement.
-	Nous allons donc décrire ici la façons dont nous avons conçu un neurone. 
-	Un neurones a deux modes de fonctionnement.
+	Nous allons donc décrire ici la façon dont nous avons conçu un neurone.
+	Un neurone a deux modes de fonctionnement.
 	Le premier est le mode de chargement des poids en mémoire, le second
-	est le mode de calculs.
+	est le mode de calcul.
 
 	\paragraph{Le mode de chargement des poids\\}
-	
-	Pour permettre aux neurones d'accomplir leur rôle principale, il faut que chaque neurone ai
-	accès à leurs poids. Etant donné que chaque neurone doit disposer de ces propres poids
+
+	Pour permettre aux neurones d'accomplir leur rôle principale, il faut que chaque neurone ait
+	accès à ses poids. Etant donné que chaque neurone doit disposer de ses propres poids
 	(identiques pour une application donnée et donc pour une grandes quantité d'images)
 	il est donc préférable que chaque neurone les mémorise. Afin d'accomplir cela,
 	les neurones reçoivent une adresse (numero du poids à mémoriser) ainsi qu'un poids.
-	Alors le neurones peut mémoriser le poids présent sur son entrée dans
-	sa BRAM à l'adresse reçue à condition que ce neurones possède le {\em token} de
+	Alors le neurone peut mémoriser le poids présent sur son entrée dans
+	sa BRAM à l'adresse reçue à condition que ce neurone possède le {\em token} de
 	configuration et qu'il reçoive le signal lui indiquant qu'un poids est présent sur son entrée.\\
-	Le token de configuration est passé de neurones en neurones
-	sur ordre du signal de contrôle pour qu'ils se configurent les uns après les autres.
+	Le token de configuration est passé de neurone en neurone
+	sur ordre du signal de contrôle pour qu'ils se configurent l'un après l'autre.
 	Vous trouverez une illustration de ce fonctionnement en
 	figure~\ref{fig:N_poids} page~\pageref{fig:N_poids}.
 	\begin{figure}[h!]
@@ -183,12 +183,12 @@ mais un calcul beaucoup plus rapide de toutes les images.
 	\end{figure}
 
 	Le mode de calcul est le mode principal d'un neurone. C'est dans ce mode que le neurone
-	reçoit des données et qu'il effectue une succession de multiplication à accumulation entrée
+	reçoit des données et qu'il effectue une succession de multiplications à accumulations entre
 	la valeur du pixel reçu et le poids correspondant à l'adresse qui lui est donné. L'opération clé
 	d'un neurone peut être écrite comme :
 	$$\sum_{adr=0}^n p_{adr}*d$$
 	avec $n$ données entrantes dans le réseau, $p_{adr}$ le poids à l'adresse $adr$
-	et $d$ la données entrante.
+	et $d$ la donnée entrante.
 
 	En effectuant cette opération sur chaque pixel d'une image, un neurone du premier niveau du réseau
 	est capable de produire un résultat par image. Les neurones des niveaux suivant ne reçoivent
@@ -197,12 +197,12 @@ mais un calcul beaucoup plus rapide de toutes les images.
 	\\{\em Notez qu'entre deux niveaux les résultats passent par l'étage de recode
 	(cf. Partie~\ref{plan:recode} "L'étage de recodage")}.
 
-	Une fois que chaque neurone à produit son résultat, ils vont en faire une copie dans
+	Une fois que chaque neurone a produit son résultat, ils vont en faire une copie dans
 	un registre appelé {\em miroir} et remettre le registre d'accumulation à 0. Ainsi,
 	le calcul de l'image suivante pourra être commencé alors que résultat de l'image précédente
 	sera évacué vers la FIFO de sortie suivante. Pour ce faire, à la réception du signal
-	{\em sauver accu dans miroir}, chaque neurones va faire passer la valeur de son
-	registre miroir au neurone suivant et récupérer la valeur du neurone précédant.
+	{\em sauver accu dans miroir}, chaque neurone va faire passer la valeur de son
+	registre miroir au neurone suivant et récupérer la valeur du neurone précédent.
 	Cela permet de ne connecter qu'un neurone à la FIFO
 	et de faire évacuer les données les unes après les autres dans la FIFO
 	(voir figure~\ref{fig:N_calcul} page~\pageref{fig:N_calcul}).
@@ -219,7 +219,7 @@ Les signaux de contrôle de la FSM sont reliés à tous les neurones.
 Pour des raisons de simplicité le contrôle des neurones est séparé en deux
 machines à états qui communiquent entre elles par le biais d'un drapeau.
 
-\paragraph{La machine à états de contrôle des neurones}
+\paragraph{La machine à états de contrôle des neurones\\}
 
 L'ensemble de cette machine à états est visible dans la
 figure~\ref{fig:fsm}~page~\pageref{fig:fsm}.
@@ -230,8 +230,8 @@ les signaux de contrôle à tous les neurones.
 Dans le mode chargement des poids de neurones, il faut être capable de commander
 un neurone à la fois. Pour cela, la FSM génère un token de configuration au début
 de la phase de chargement des poids et le donne au premier neurone. Sans ce token,
-le neurone est inactif dans cette phase. La machine à états, une fois fini de
-charger les poids d'un neurone, déclenche un décalage du token de configuration
+le neurone est inactif dans cette phase. Une fois que la machine à états a fini de
+charger les poids d'un neurone, elle déclenche un décalage du token de configuration
 entre les neurones. Une fois le dernier neurone atteint, le décalage du token
 le renvoie sur la FSM qui sait donc qu'elle a fini de configurer l'ensemble des
 neurones.
@@ -275,7 +275,7 @@ Voici de courtes explications pour les différents états:
 \end{itemize}
 
 
-\paragraph{La machine à états de la chaîne de miroirs}
+\paragraph{La machine à états de la chaîne de miroirs\\}
 
 L'ensemble de cette machine à états est visible dans la
 figure~\ref{fig:fsm_miroir}~page~\pageref{fig:fsm_miroir}.
@@ -313,7 +313,7 @@ Afin de pouvoir relier les signaux de contrôle de la machine à états à plus 
 100 ou 200 neurones, de simples fils auraient posés
 problème. En effet, pour deux neurones très éloignés dans le FPGA, les temps
 de propagation des données envoyées en même temps de la FSM n'auraient pas été
-identiques et cela aurait crée des problèmes de synchronisation. Pour cela, nous
+identiques et cela aurait créé des problèmes de synchronisation. Pour cela, nous
 avons utilisé des buffers de distribution, déjà disponible, pour distribuer les
 signaux de contrôle de la FSM à tous les neurones ou les données d'entrée aux neurones. 
 Un buffer de distribution est constitué d'un arbre de fils avec la racine connectée à un port de sortie de la FSM et les feuilles
@@ -344,7 +344,7 @@ ajouter une constante aux valeurs sortants du niveau de neurones (chaque
 constante est propre à un neurone) et
 supprimer les valeurs négatives après ajout de constante.
 
-Elle est contrôlée par une machine à états visible sur la
+L'étage est contrôlé par une machine à états visible sur la
 figure~\ref{fig:recode_fsm}~page~\pageref{fig:recode_fsm}.
 
 \begin{figure}[h!]
@@ -368,7 +368,7 @@ Voici de courtes explications pour les différents états:
 		sinon on attend qu'il y ait un poids disponible.
 	\item \verb+WRITE_WAIT+: on attend qu'il y ait un poids disponible.
 	\item \verb+DATA+: on effectue le traitement de la donnée en entrée seulement si:
-		elle est disponible, il y a de place dans la FIFO de sortie et on a pas atteint
+		elle est disponible, il y a de place dans la FIFO de sortie et on n'a pas atteint
 		la fin de la totalité des données sortant d'un décalage complet de la chaîne
 		de miroirs. Le traitement consiste à ajouter une constante, et supprimer la valeur
 		(envoyer 0 en sortie) si la valeur après ajout de constante est négative, sinon on
@@ -428,7 +428,7 @@ la récupération des résultats. Les données
 concernant les poids, les constantes, les images et les paramètres (taille d'une
 image, nombre de neurones à chaque niveau, nombre d'images) étaient toutes notées
 dans un fichier (\texttt{dataset.h}). Nous avons gardé ce fonctionnement pour la
-majeur partie de notre projet car il nous a permis de tester facilement notre
+majeure partie de notre projet car il nous a permis de tester facilement notre
 IP pour des images de petites tailles, des niveaux de neurones avec très peu
 de neurones (3) et de configurer facilement les pixels des images et les poids
 choisis pour connaître les résultats attendus et comparer avec ceux de notre IP.
@@ -441,11 +441,11 @@ référence afin de tester l'application réelle. \\
 Pour pouvoir échanger des données entre le logiciel embarqué et notre IP, 16
 registres de 32 bits peuvent être lus et écrits des deux côtés de notre
 système. Par exemple
-les 4 premiers bits de registre 3 contiennent la configuration actuelle de notre
+les 4 premiers bits du registre 3 contiennent la configuration actuelle de notre
 IP : mode envoi des images, mode configuration (cad chargement des poids) du
 niveau 1, 2 ou de l'étage de recodage. Cette configuration est transmise
 aux blocs concernés afin qu'ils changent leur comportement et attendent les
-données utiles en entrée. Un autre bit de ce registre permet de d'envoyer le
+données utiles en entrée. Un autre bit de ce registre permet d'envoyer le
 signal \texttt{RESET} à toute notre IP.
 Les registres sont accédés avec un offset à partir d'une adresse de base
 sur le bus AXI. Des fonctions utilitaires déjà présentes
@@ -494,7 +494,7 @@ faites :
 \subsubsection{Débogage}
 % problèmes uniquement liés au soft : printf et GDB
 % (allocation et remplissage des tableaux)
-Pour déboguer le système global, notre IP avec le logiciel embarqué nous avons
+Pour déboguer le système global, notre IP avec le logiciel embarqué, nous avons
 utilisé différentes manières. \\
 Pour des problèmes uniquement liés au logiciel (mauvaise taille, mauvais indices
 des tableaux, ...),
@@ -557,8 +557,27 @@ Ainsi le nombre de cycles requis pour traiter une image est:
 
 Donc le temps de calcul d'une image est:
 \begin{equation}
-	T_{calcul} = N_{calcul}/f_{réseau\_de\_neurones} 
+	T_{calcul} = N_{calcul}/f_{réseau\_de\_neurones}
 \end{equation}
+
+Néanmoins, si nous avions optimisé la machine à états de contrôle des neurones pour
+qu'elle prenne les données en entrée en un cycle au lieu de 2, il est possible
+d'obtenir :
+\begin{equation}
+	N_{calcul\_optimal} = N_1 \times 2 + FSIZE \times 2 + N_2
+\end{equation}
+
+Et
+\begin{equation}
+	T_{calcul\_optimal} = N_{calcul}/f_{réseau\_de\_neurones}
+\end{equation}
+
+Malheureusement, nous avons manque de temps pour optimiser cette machine à états
+et valider que l'IP fonctionnait encore après optimisation.
+
+\paragraph{Implantation sur carte Zedboard\\}
+
+TODO: parler de l'IP générée sur Zedboard, \%DSP et \%BRAM notamment.
 
 
 \paragraph{\'{E}valuation des performances\\}
