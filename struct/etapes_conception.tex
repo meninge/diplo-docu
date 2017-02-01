@@ -192,10 +192,10 @@ mais un calcul beaucoup plus rapide de toutes les images.
 
 	En effectuant cette opération sur chaque pixel d'une image, un neurone du premier niveau du réseau
 	est capable de produire un résultat par image. Les neurones des niveaux suivant ne reçoivent
-	pas des pixels mais les résultats du niveaux précédents et opèrent de la même façon pour enfin
-	produire chacun un résultat (voir figure~\ref{N_calcul} page~\pageref{N_calcul}).
+	pas des pixels mais les résultats du niveaux précédent et opère de la même façon pour enfin
+	produire chacun un résultat (voir figure~\ref{fig:N_calcul} page~\pageref{fig:N_calcul}).
 	\\{\em Notez qu'entre deux niveaux les résultats passent par l'étage de recode
-	(cf. Partie 3.2.5 "Le niveau de neurones")}.
+	(cf. Partie~\ref{plan:recode} "L'étage de recodage")}.
 
 	Une fois que chaque neurone a produit son résultat, ils vont en faire une copie dans
 	un registre appelé {\em miroir} et remettre le registre d'accumulation à 0. Ainsi,
@@ -205,7 +205,7 @@ mais un calcul beaucoup plus rapide de toutes les images.
 	registre miroir au neurone suivant et récupérer la valeur du neurone précédent.
 	Cela permet de ne connecter qu'un neurone à la FIFO
 	et de faire évacuer les données les unes après les autres dans la FIFO
-	(voir figure~\ref{N_calcul} page~\pageref{N_calcul}).
+	(voir figure~\ref{fig:N_calcul} page~\pageref{fig:N_calcul}).
 
 \subsubsection{La machine à états (FSM) du niveau de neurones}
 
@@ -310,29 +310,32 @@ Le niveau de neurones est l'entité de notre IP qui regroupe un certain nombre
 de neurones (100 ou 200 pour le premier niveau, 10 pour le deuxième) et une
 machine à états afin de les contrôler. \\
 Afin de pouvoir relier les signaux de contrôle de la machine à états à plus de
-100 ou 200 neurones et tous leurs ports d'entrée, de simples fils auraient posé
-problème. En effet pour deux neurones très éloignés dans le routage, les temps
+100 ou 200 neurones, de simples fils auraient posés
+problème. En effet, pour deux neurones très éloignés dans le FPGA, les temps
 de propagation des données envoyées en même temps de la FSM n'auraient pas été
 identiques et cela aurait créé des problèmes de synchronisation. Pour cela, nous
 avons utilisé des buffers de distribution, déjà disponible, pour distribuer les
-signaux de contrôle de la FSM à tous les neurones. Ils implémentent un arbre
-de fils avec la racine connectée à un port de sortie de la FSM et les feuilles
+signaux de contrôle de la FSM à tous les neurones ou les données d'entrée aux neurones. 
+Un buffer de distribution est constitué d'un arbre de fils avec la racine connectée à un port de sortie de la FSM et les feuilles
 connectées à tous les neurones. Le nombre de fils fils de chaque noeud est un
-% TODO: ajouter la ref de la figure mentionée ci-dessus
-paramètre du distribuf (2 dans la figure .. page ..) et le passage d'un niveau
-du distribuf prend un cycle. On est alors assuré que la donnée arrivera en même
+paramètre du buffer (2 dans la figure~\ref{fig:nnlayer} page~\pageref{fig:nnlayer}). 
+L'avantage d'utiliser un buffer de distribution est qu'il certifie que le passage d'un niveau de l'arbre 
+prend un cycle. On est alors assuré que la donnée arrivera en même
 temps à tous les neurones. \\
 Certains signaux se connectent uniquement au premier ou au dernier des neurones
-et d'autres entre deux neurones consécutifs. Pour gérer ces connexions
-exceptionnelles on instancie tous les neurones grâce à la boucle VHDL :\\
+et d'autres entre deux neurones consécutifs, ces connexions sont alors réalisées avec de simples fils. 
+Pour gérer ces connexions on instancie tous les neurones grâce à la boucle VHDL :\\
 \texttt{gen\_neu: for i in 0 to NBNEU-1 generate} \\
 où chacun des ports des neurones sont reliés à des tableaux de signaux pour
 faciliter leur utilisation.
 
-% distribufs : pourquoi sont-ils utilisés au lieu de simples fils ?
-% éloignement des unités, même fanout, pour les signaux qui vont à chaque neurones
-% même nombre de fils
-% fils simples de contrôle pour chaque neurone, connection de tous les composants
+\begin{figure}[h!]
+	\includegraphics[width=\textwidth]{nnlayer}
+	\caption{Schema d'un niveau de recode montrant les différents type 
+	d'interconnexion entre les différents éléments le constituant}
+	\label{fig:nnlayer}
+\end{figure}
+
 \subsubsection{L'étage de recodage}
 \label{plan:recode}
 
@@ -376,10 +379,42 @@ Voici de courtes explications pour les différents états:
 		l'état de \verb+RESET+.
 \end{itemize}
 
-
-
 \subsubsection{Le pipeline complet}
-%TODO: Lucas
+Une fois chaque éléments ci-dessus créé, il a fallut les mettre ensemble pour accomplir 
+le fonctionnement global du réseau. Il est important de réfléchir à la façon dont ces différents éléments 
+échangent leurs données. En effet, les différents organes du réseaux ne doivent pas calculer la même 
+quantité de donnée, donc le temps de traitement d'une image n'est pas identique dans tout le réseau. 
+C'est pourquoi, entre chaque élément du réseau (entrée, niveau de neurone 1, recodage, niveau 2, sortie) 
+nous avons utilisé des FIFOs. Les FIFOs utilisées nous ont été fournies, elles ont une entrée et une sortie sur 32 bits, 
+64 cases mémoire de 32 bits, 4 signaux de contrôle et 2 signaux donnant le nombre de places disponibles et occupées. 
+Deux des signaux de contrôle permettent à la FIFO d'avertir l'élément suivant qu'une donnée peut être sortie de la FIFO 
+et à l'élément précédent  q'une donnée peut être écrite. Les deux autres signaux de contrôle permettent eux aux élément 
+d'avertir la FIFO qu'une donnée est lue ou écrite (c'est un signal acquittement). 
+L'utilisation des FIFOs du réseau est différente dans les deux modes du réseau.
+	\paragraph{Le pipeline en mode chargement des poids}
+	Lorsque le réseau de neurones est en mode configuration, chaque élément va récupérer les constantes dans la 
+	toute première FIFO. En effet, le DMA va faire un transfert de donnée de la DDR vers la FIFO d'entrée via le bus AXI. 
+	En connectant correctement les signaux de contrôle de la première FIFO aux différents éléments du réseau, 
+	ils pourront récupérer les données dont ils ont besoin pour le mode de calcul chacun leur tour. 
+	(voir. figure~\ref{fig:pipeline_poids} page~\pageref{fig:pipeline_poids})
+	
+	\begin{figure}[h!]
+		\includegraphics[width=\textwidth]{pipeline_poids}
+		\caption{Pipeline du réseau en mode chargement des poids pour illustrer l'utilisation de la FIFO 0}
+		\label{fig:pipeline_poids}
+	\end{figure}
+	
+	\paragraph{Le pipeline en mode calcul}
+	Lorsque le réseau de neurones est en mode de calcul, les images arrivent pixel par pixel dans la première FIFO. 
+	Chaque neurone produit 1 donnée qu'ils envoient une à une dans la FIFO n°2, le recodage traite alors ces 
+	données une à une et enfin l'étage 2 reçoit ces résultats en lisant dans la FIFO n°3. La dernière FIFO 
+	permet de stocker les données de sortie du réseau afin de les envoyer (par paquets de 16) au micro-processeur. 
+	(voir figure~\ref{fig:pipeline_data} page~\pageref{fig:pipeline_data}).
+	\begin{figure}[h!]
+		\includegraphics[width=\textwidth]{pipeline_data}
+		\caption{Pipeline du réseau en mode de calcul pour illustrer l'utilisation des FIFO dans le réseau}
+		\label{fig:pipeline_data}
+	\end{figure}
 
 \subsection{Logiciel de commande}
 Le logiciel de commande est le logiciel embarqué sur la carte, qui s'execute
@@ -456,7 +491,6 @@ faites :
 		envoyer à l'IP un signal \texttt{RESET} entre deux écritures
 		afin de vider les FIFOs de leurs données résiduelles invalides.
 \end{itemize}
-% TODO: inclure schéma général qui résume ces transactions
 \subsubsection{Débogage}
 % problèmes uniquement liés au soft : printf et GDB
 % (allocation et remplissage des tableaux)
