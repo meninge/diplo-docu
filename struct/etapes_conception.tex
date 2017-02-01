@@ -141,7 +141,8 @@ mais un calcul beaucoup plus rapide de toutes les images.
 	Le premier est le mode de chargement des poids en mémoire, le second
 	est le mode de calculs.
 
-	\subsubsection{Le mode de chargement des poids}
+	\paragraph{Le mode de chargement des poids\\}
+	
 	Pour permettre aux neurones d'accomplir leur rôle principale, il faut que chaque neurone ai
 	accès à leurs poids. Etant donné que chaque neurone doit disposer de ces propres poids
 	(identiques pour une application donnée et donc pour une grandes quantité d'images)
@@ -162,7 +163,7 @@ mais un calcul beaucoup plus rapide de toutes les images.
 		\end{center}
 	\end{figure}
 
-	\subsubsection{Le mode de calcul}
+	\paragraph{Le mode de calcul\\}
 	\begin{figure}[h!]
 		\begin{center}
 			\includegraphics[scale=0.4]{N_calcul}
@@ -224,6 +225,7 @@ Nous avons cependant complété ce code afin qu'il puisse gérer notre IP compl�
 avec deux niveaux de neurones et un étage de recodage.
 Par la suite, nous avons repris les mêmes données MNIST que pour le logiciel de
 référence afin de tester l'application réelle. \\
+
 \subsubsection{Moyens de communication avec l'IP}
 Pour pouvoir échanger des données entre le logiciel embarqué et notre IP, 16
 registres de 32 bits peuvent être lus et écrits des deux côtés de notre
