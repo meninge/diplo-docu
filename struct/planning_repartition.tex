@@ -5,8 +5,9 @@ du groupe.
 \subsection{Planning}
 
 Sur la figure~\ref{fig:PlanningPrevision}~page~\pageref{fig:PlanningPrevision},
-les tâches ont été réparties temporellement sur la période du projet. Ce planning
-prévisionnel a été dans l'ensemble bien respecté durant tout le projet.
+les tâches ont été réparties temporellement sur la période du projet.
+Le planning réel est quelque peu différent du planning prévisionnel.
+Il est visible sur la figure~\ref{fig:PlanningReel} page~\pageref{fig:PlanningReel}.
 
 \begin{figure}[ht!]
 	\begin{ganttchart}
@@ -65,6 +66,65 @@ prévisionnel a été dans l'ensemble bien respecté durant tout le projet.
 	\end{ganttchart}
 	\caption{Planning prévisionnel}
 \label{fig:PlanningPrevision}
+\end{figure}
+
+\begin{figure}[ht!]
+	\begin{ganttchart}
+		[y unit title=0.4cm,
+			y unit chart=0.5cm,
+			vgrid,hgrid,
+			title label anchor/.style={below=-1.6ex},
+			title left shift=.05,
+			title right shift=-.05,
+			title height=1,
+			bar/.style={fill=gray!50},
+			incomplete/.style={fill=white},
+			progress label text={},
+			bar height=0.7,
+			group right shift=0,
+			group top shift=.6,
+			group height=.3,
+		]
+		{1}{20}
+		%labels
+		\gantttitle{Projet}{20} \\
+		\gantttitle{Oct}{4}
+		\gantttitle{Nov}{4}
+		\gantttitle{Dec}{4}
+		\gantttitle{Jan}{4}
+		\gantttitle{Feb}{4}
+		\ganttnewline
+
+		%tasks
+		%0
+		\ganttbar{Spécifications}{2}{4} \\
+		%1
+		\ganttbar{Programme de référence}{3}{4} \\
+		%2
+		\ganttbar{Implantation de l'IP}{5}{13} \\
+		%3
+		\ganttbar{Validation en simulation}{6}{8} \\
+		%4
+		\ganttbar{Logiciel de commande}{9}{16} \\
+		%5
+		\ganttbar{Validation sur carte}{12}{16} \\
+		%6
+		\ganttbar{Evaluation des performances}{17}{17} \\
+		%7
+		\ganttbar{Documentation}{12}{17} \\
+		%8
+		\ganttbar{Soutenance}{18}{18} \\
+
+		%relations
+
+		\ganttlink{elem0}{elem2}
+		\ganttlink{elem0}{elem3}
+		\ganttlink{elem4}{elem6}
+		\ganttlink{elem5}{elem6}
+		\ganttlink{elem3}{elem5}
+	\end{ganttchart}
+	\caption{Planning réel}
+	\label{fig:PlanningReel}
 \end{figure}
 
 Voici la description des différentes tâches:
