@@ -43,11 +43,11 @@ prévisionnel a été dans l'ensemble bien respecté durant tout le projet.
 		%2
 		\ganttbar{Implantation de l'IP}{5}{13} \\
 		%3
-		\ganttbar{Validation en simulation}{6}{14} \\
+		\ganttbar{Validation en simulation}{6}{9} \\
 		%4
-		\ganttbar{Validation sur carte}{11}{15} \\
+		\ganttbar{Logiciel de commande}{9}{12} \\
 		%5
-		\ganttbar{Logiciel de commande}{12}{14} \\
+		\ganttbar{Validation sur carte}{12}{15} \\
 		%6
 		\ganttbar{Evaluation des performances}{16}{17} \\
 		%7
@@ -61,6 +61,7 @@ prévisionnel a été dans l'ensemble bien respecté durant tout le projet.
 		\ganttlink{elem0}{elem3}
 		\ganttlink{elem4}{elem6}
 		\ganttlink{elem5}{elem6}
+		\ganttlink{elem3}{elem5}
 	\end{ganttchart}
 	\caption{Planning prévisionnel}
 \label{fig:PlanningPrevision}
@@ -118,5 +119,30 @@ problèmes rencontrés.
 
 \subsection{Problèmes rencontrés}
 
-TODO: Parler des problèmes rencontrés lors du projet (notamment de la validation
-sur carte et des latchs qu'on n'avait pas prévu).
+Parmi les quelques problèmes rencontrés, l'utilisation de vivado nous a fait perdre beaucoup de temps. 
+En effet, bien que ce logiciel de conception est puissant et complet, il a certain comportement assez étrange. 
+Nous citerons par exemple, la démarche à mettre en oeuvre pour que le logiciel prenne 
+effectivement en compte les modifications des fichiers sources (prêt de 10 clics et environ 2 minutes). 
+Un autre exemple, qui nous a fait perdre prêt d'une demi-journée, est le fait que le logiciel décide (sans prévenir) 
+qu'il génère le bitstream dans un nouveau fichier sans prévenir le SDK qui, lui, envoie toujours l'ancien bitstream. 
+Un dernier cas nous a posé problème, ainsi qu'à nos tuteurs, et le passage du projet d'un carte à l'autre. 
+Pour réussir à faire cela, nous avons du recréer le projet en partant de zéro.\\
+
+Outre ces nombreux problème dû aux outils de conception, nous nous sommes confronté à un autre problème inattendu. 
+En effet, nous avions prévu de passer beaucoup moins de temps sur la partie de validation sur 
+carte et plus de temps sur la validation en simulation. Nous pensions que si l'IP fonctionnait en simulation, 
+elle aurait le même comportement après synthèse et sur le FPGA. 
+Or, dans plusieurs endroits de notre IP, l'outil de synthèse instanciait des latchs à la place de registres. 
+A cause de cela, le fonctionnement n'était pas celui attendu, et nous avons du repasser du temps pour déboguer l'IP.
+
+
+
+
+
+
+
+
+
+
+
+
