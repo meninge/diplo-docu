@@ -61,7 +61,7 @@ le résultat de chaque neurone est additionné avec une constante.
 \subsubsection{Les données à traiter dans le réseau}
 
 La configuration actuelle de ce réseau de neurone est adaptée pour la
-reconnaissance de chiffres manuscrits de la base de données MNIST. Une image
+reconnaissance de chiffres manuscrits de la base de données MNIST\cite{lecun2010mnist}. Une image
 en entrée ($28 \times 28$ pixels) correspond à un chiffre manuscrit de 0 à 9.
 Le but de ce réseau de neurone est de reconnaître et d'identifier le chiffre
 d'une image. Pour une image donnée, le chiffre identifié par le réseau correspond
@@ -103,7 +103,7 @@ il est nécessaire d'effectuer un décalage à droite ensuite.
 \subsubsection{Mise en forme des données MNIST}
 
 Les poids des neurones et les constantes des étages de recodage
-pour l'application MNIST, que nous utilisons dans
+pour l'application MNIST\cite{lecun2010mnist}, que nous utilisons dans
 le logiciel de référence et dans notre IP nous ont été fournis au début du projet
 sous forme de fichier texte où sont présentes toutes les données, séparées par
 des virgules, et où chaque ligne correspond à un neurone. Un script Python nous
@@ -125,7 +125,7 @@ facilement ces informations depuis le logiciel.
 
 Les résultats du logiciel de référence en sortie de chacun des niveaux nous
 sont utiles pour les comparer avec ceux de notre IP et s'assurer que les calculs
-sont justes pour la classification des images MNIST. On s'attend à trouver
+sont justes pour la classification des images MNIST\cite{lecun2010mnist}. On s'attend à trouver
 un même taux d'erreur ($93.80\%$) car les configurations sont identiques
 mais un calcul beaucoup plus rapide de toutes les images.
 
@@ -434,7 +434,7 @@ de neurones (3) et de configurer facilement les pixels des images et les poids
 choisis pour connaître les résultats attendus et comparer avec ceux de notre IP.
 Nous avons cependant complété ce code afin qu'il puisse gérer notre IP complète
 avec deux niveaux de neurones et un étage de recodage.
-Par la suite, nous avons repris les mêmes données MNIST que pour le logiciel de
+Par la suite, nous avons repris les mêmes données MNIST\cite{lecun2010mnist} que pour le logiciel de
 référence afin de tester l'application réelle. \\
 
 \subsubsection{Moyens de communication avec l'IP}
