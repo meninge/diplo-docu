@@ -91,9 +91,9 @@ dossier contenant vos IPs.
 
 Ensuite, il faut ouvrir le projet et lancer "{\em Tools -> create and package IP}".
 Enfin, sélectionner "{\em package a specific directory}" puis choisir "\verb+<dossier_contenant_les_IPs>/my_axi_full_master+".
-Vérifier que le périphérique ajouté est bien un "[{\em AXI peripheral}" avant de confirmer.
+Vérifier que le périphérique ajouté est bien un "{\em AXI peripheral}" avant de confirmer.
 
-Après cela, il rajouter des blocs de façons à obtenir un {\em bloc design} ressemblant à la figure~\ref{fig:user_man_bloc_design} page~\pageref{fig:user_man_bloc_design}
+Après cela, il faut rajouter des blocs de façons à obtenir un {\em bloc design} ressemblant à la figure~\ref{fig:user_man_bloc_design} page~\pageref{fig:user_man_bloc_design}
 tout du moins en ce qui concerne le bloc {\em myaxifullmaster\_0} (IP réseau de neurones).
 
 \begin{figure}[h!]
@@ -107,7 +107,7 @@ partie~\ref{plan:user_man_modif_param}
 page~\pageref{plan:user_man_modif_param}.
 
 
-\subsubsection{Modifications des paramètres du réseau de neurones}
+\subsubsection{Modification des paramètres du réseau de neurones}
 \label{plan:user_man_modif_param}
 
 Pour modifier les paramètres du réseau de neurones (nombre de neurones de chaque
@@ -116,9 +116,9 @@ de l'IP ont changés. Pour cela, il faut:
 \begin{enumerate}
 	\item modifier dans le fichier \verb+myaxifullmaster_v1_0_S00_AXI.vhd+ (situé dans le sous-dossier \verb+hdl/+ de  \verb+<dossier_contenant_les_IPs>/my_axi_full_master+), les paramètres~:
 		\begin{itemize}
-			\item \verb+LAYER1_FSIZE+ pour changer la taille des images en entrée
-			\item \verb+LAYER1_NBNEU+ pour changer le nombre de neurones dans le premier niveau
-			\item \verb+LAYER2_NBNEU+ pour changer le nombre de neurones dans le deuxième niveau
+			\item \verb+LAYER1_FSIZE+ pour changer la taille des images en entrée,
+			\item \verb+LAYER1_NBNEU+ pour changer le nombre de neurones dans le premier niveau,
+			\item \verb+LAYER2_NBNEU+ pour changer le nombre de neurones dans le deuxième niveau~;
 		\end{itemize}
 	\item sélectionner l'IP dans la partie "{\em Project Manager}"
 		et avec un clic-droit sélectionner l'option "{\em Re-package IP}".
@@ -132,4 +132,39 @@ Enfin pour lancer {\em Xilinx SDK} afin de programmer le FPGA et lancer le logic
 
 
 %TODO: Partie SW et lancement de l'application
+\subsection{Utilisation du réseau de neurones}
+Une fois que l'IP du réseau de neurones a été intégrée à {\em Vivado}, que le
+bitstream a été généré, exporté et que le SDK est lancé, l'utilisateur
+peut utiliser des fonctions simples incluses dans le projet pour lancer le
+réseau de neurones.
+Il peut soit utiliser les données MNIST pour les poids et frames qui sont
+déjà dans le projet (fichiers \texttt{net.c} et \texttt{frame.c}) soit utiliser
+ses propres données à rentrer dans le fichier \texttt{dataset.h}. \\
+Une fonction permet de lancer le processus de calcul sur l'IP et de récupérer
+les résultats, pour chaque frame envoyée, des neurones de sortie. Une fonction
+identique permet de faire cette opération seulement en logiciel afin de, plus
+tard, comparer performances logicielles et matérielles. D'après le
+prototype
 
+\begin{lstlisting}
+void nn_hardware(uint8_t *frames, uint32_t *results,
+		int16_t *weights_level1,
+		int16_t *weights_level2,
+		int16_t *constants_recode_level1,
+		int16_t *constants_recode_level2);
+\end{lstlisting}
+
+on envoie à la fonction l'adresse de la première case des tableaux qui
+contiennent les images, les poids, les constantes et du tableau qui contient
+les résultats du calcul. La fonction
+
+\begin{lstlisting}
+void classify(uint32_t *results, uint32_t *classification);
+\end{lstlisting}
+
+classe ces résultats et place dans \texttt{classification} pour chaque image
+le neurone séléctionné (pour MNIST c'est le chiffre prédit). \\
+Une fois que le code est écrit, l'utilisateur peut le compiler sous le SDK
+et lancer tout le programme sur la carte (\texttt{Run}) ou l'exécuter pas à pas
+(\texttt{Debug}). Les fonctions utilisées affichent du texte grâce au lien série
+avec le composant UART.

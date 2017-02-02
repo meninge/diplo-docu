@@ -1,19 +1,20 @@
 Pour démontrer que notre réseau de neurone est capable de trouver le nombre écrit à la main 
-dans une image, nous allons vous faire une démonstration de ces capacités ainsi qu'un démonstration de ces performances. 
+dans une image, nous allons vous faire une démonstration de ses capacités ainsi
+qu'une démonstration de ses performances. 
 La démonstration se décomposera donc en deux étapes.
 
 \subsection{Démonstration du fonctionnement}
 
 \paragraph{Création de l'image à analyser\\}
 	L'image à analyser par notre réseau de neurones doit être créée. Ainsi, nous préparerons 
-	un image de $28 \times 28$ pixels dans laquelle nous dessinerons un chiffre de 0 à 9. 
+	une image de $28 \times 28$ pixels dans laquelle nous dessinerons un chiffre de 0 à 9. 
 	Cette image de 784 pixels sera alors transformée en un tableau de 784 valeurs. 
 	Ce tableau, une fois exporté dans notre logiciel de commande de l'IP, 
 	pourra être envoyé comme données d'entrée à traiter par le réseau de neurones.
 	
 \paragraph{Analyse de l'image et prédiction du chiffre par le réseau de neurone\\}
 	Le réseau de neurones va donc être utilisé exactement comme avec les données MNIST\cite{lecun2010mnist}, 
-	mise à part que l'image source aura été produite par nos soins. A la sortie du réseau 
+	mise à part que l'image source aura été produite par nos soins. \`{A} la sortie du réseau 
 	nous trouverons alors un vecteur de taille 10. La coordonnée du vecteur dont la 
 	valeur est la plus grande sera la valeur prédite par le réseau de neurone. 
 	Par exemple, si en sortie du réseau de neurone nous avons $\{991342, 13124, -104, 54, 567, -345789, 1086, 2, 0, -10\}$ 

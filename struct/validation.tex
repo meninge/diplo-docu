@@ -5,7 +5,7 @@ Pour valider notre IP, nous avons du avoir recours à deux modes de validation :
 la validation en simulation et la validation sur carte.
 En effet, le simulateur ne permet pas de simuler notre IP complète avec le bus
 AXI et le processeur ARM, il faut donc avoir recours à une validation sur carte
-Zybo et Zedboard.
+Zybo et ZedBoard.
 
 \subsection{Validation en simulation}
 
@@ -13,7 +13,7 @@ La validation en simulation permet de vérifier le comportement de chacun des
 composants de notre IP, individuellement et en association avec d'autres
 composants.
 
-Les simulations ont été réalisées à l'aide du simulateur de Xilinx Vivado.
+Les simulations ont été réalisées à l'aide du simulateur de {\em Xilinx Vivado}.
 
 \subsubsection{Le neurone}
 Pour tester le neurone, il faut que le test bench simule l'environnement dans lequel
@@ -21,12 +21,12 @@ le neurone doit évoluer. C'est-à-dire, les interactions avec les autres neuron
 la machine à états et les FIFO de données en entrée et en sortie.
 Ainsi dans le test bench du neurone, nous avons vérifié que le neurone :
 \begin{itemize}
-	\item puisse écrire dans sa BRAM lorsqu'il est en mode chargement des poids.
-	\item puisse lire les coefficients en BRAM quand il est en mode accumulation.
-	\item réagisse bien à la demande du passage de token.
-	\item effectue les bons calculs.
-	\item copie bien leur registre d'accumulation dans le registre miroir.
-	\item évacue bien la donnée du miroir par la chaine de miroir.
+	\item puisse écrire dans sa BRAM lorsqu'il est en mode chargement des poids~;
+	\item puisse lire les coefficients en BRAM quand il est en mode accumulation~;
+	\item réagisse bien à la demande du passage de token~;
+	\item effectue les bons calculs~;
+	\item copie bien leur registre d'accumulation dans le registre miroir~;
+	\item évacue bien la donnée du miroir par la chaine de miroir~;
 	\item interagisse bien avec les signaux de contrôle des FIFO en lecture et en écriture.
 \end{itemize}
 
@@ -38,11 +38,11 @@ Ce test bench permet de vérifier le comportement précis de la machine
 
 Durant ce test bench, nous avons vérifié que la machine à états:
 \begin{itemize}
-	\item est dans l'état attendu tout au long du test bench.
+	\item soit dans l'état attendu tout au long du test bench~;
 	\item contrôle correctement un neurone, à partir du fonctionnement
-	détaillé dans les spécifications.
-	\item passe en mode chargement des poids ou accumulation et a le
-	comportement attendu dans chacun des cas.
+	détaillé dans les spécifications~;
+	\item passe en mode chargement des poids ou accumulation et ait le
+	comportement attendu dans chacun des cas~;
 	\item effectue un décalage de la chaîne de miroir à la fin d'une
 	accumulation.
 \end{itemize}
@@ -58,9 +58,9 @@ Durant ce test bench, nous avons vérifié que la machine à états:
 \begin{itemize}
 	\item contrôle correctement plusieurs neurones, en tenant
 	compte des buffers de distribution des signaux qui ajoutent un
-	délai dans la communication.
-	\item passe en mode chargement des poids ou accumulation et a le
-	comportement attendu dans chacun des cas.
+	délai dans la communication~;
+	\item passe en mode chargement des poids ou accumulation et ait le
+	comportement attendu dans chacun des cas~;
 	\item effectue un décalage de la chaîne de miroir à la fin d'une
 	accumulation.
 \end{itemize}
@@ -82,22 +82,22 @@ niveau de neurones et de supprimer les valeurs négatives.\\
 
 Durant ce test bench, nous avons vérifié que l'étage de recodage:
 \begin{itemize}
-	\item charge ses poids en mode chargement des poids.
+	\item charge ses poids en mode chargement des poids~;
 	\item en mode accumulation, ajoute une constante propre à chaque neurone
-	à la donnée d'entrée, vérifie que le résultat est positif, le transmet à
+	à la donnée d'entrée, vérifie que le résultat soit positif, le transmet à
 	la FIFO suivante dans ce cas, ou transmet 0 dans le cas contraire.
 \end{itemize}
 
 \subsubsection{Interaction FIFO-niveau de neurones}
 
 Ce test bench permet de s'assurer que la FIFO d'entrée d'un niveau de neurones
-est bien contrôlée par le niveau de neurones correspondant.\\
+soit bien contrôlée par le niveau de neurones correspondant.\\
 
 Durant ce test bench, nous avons vérifié que le niveau de neurones:
 \begin{itemize}
 	\item contrôle correctement la FIFO d'entrée, c'est-à-dire qu'il prend
 	les données quand elles sont disponibles, et ce pour les deux modes
-	(accumulation et chargement des poids).
+	(accumulation et chargement des poids)~;
 	\item contrôle correctement la FIFO de sortie, c'est-à-dire qu'il envoie
 	des données à l'intérieur uniquement s'il y a suffisamment de place dans
 	le mode accumulation. Dans le mode chargement des poids, il ne doit pas
@@ -115,7 +115,7 @@ Durant ce test bench, nous avons vérifié que l'étage de recodage:
 	les données quand elles sont disponibles, et ce pour les deux modes
 	(accumulation et chargement des poids). Dans le mode accumulation, il
 	ne doit prendre des données que s'il y a de la place dans la FIFO de
-	sortie.
+	sortie~;
 	\item contrôle correctement la FIFO de sortie, c'est-à-dire qu'il envoie
 	des données à l'intérieur uniquement s'il y a suffisamment de place dans
 	le mode accumulation. Dans le mode chargement des poids, il ne doit pas
@@ -129,10 +129,10 @@ fonctionne correctement.\\
 
 Durant ce test bench, nous avons vérifié que l'ensemble des composants:
 \begin{itemize}
-	\item charge ses poids en mode chargement des poids, chacun son tour.
+	\item charge ses poids en mode chargement des poids, chacun leur tour.
 	De plus, ils ne doivent pas se comporter de façon incorrecte quand
-	ils ne sont ni en train de charger les poids ni en train d'accumuler.
-	\item effectue l'opération d'accumulation en mode accumulation, prend
+	ils ne sont ni en train de charger les poids ni en train d'accumuler~;
+	\item effectue l'opération d'accumulation en mode accumulation, prenne
 	les données dans sa FIFO d'entrée et transmet les données en sortie
 	uniquement s'il y a de la place.
 \end{itemize}
@@ -154,7 +154,7 @@ de notre IP.
 %TODO: LUCAS si tu veux rajouter des trucs ou affiner
 
 Suite aux tests réalisés en simulation et à l'impossibilité de simuler
-l'ensemble de la carte, nous avons dû réalisé des tests sur cartes (Zybo puis Zedboard).
+l'ensemble de la carte, nous avons dû réalisé des tests sur cartes (Zybo puis ZedBoard).
 
 Ces tests nous permettent de tester le fonctionnement conjoint du logiciel, du
 bus AXI et de notre IP. Cependant, ces tests sont long (il faut générer le
@@ -162,7 +162,7 @@ bitstream à charger dans la carte à chaque fois que l'on veut modifier le test
 en effectuer un autre). De plus, il est impossible d'observer l'ensemble du
 fonctionnement de notre IP une fois chargée dans le FPGA. Nous avons dû avoir
 recours à des registres non utilisés pour récupérer des données et contrôler
-plus finement notre IP. Le contrôle et le débogage du logiciel se fait via GDB.
+plus finement notre IP. Le contrôle et le débogage du logiciel se fait via \texttt{GDB}.
 
 \subsubsection{Tests des données envoyées}
 
@@ -208,7 +208,7 @@ que l'étage est correctement configuré et fonctionne comme attendu.
 
 \subsubsection{Conclusion}
 
-Grâce aux tests réalisés sur carte, nous pouvons terminé de valider notre IP.
+Grâce aux tests réalisés sur carte, nous pouvons terminer de valider notre IP.
 En effet, après avoir vérifié le comportement de chaque composant en simulation,
 nous pouvons voir comment cela se passe sur carte avec le logiciel.
 Certains problèmes logiciels comme matériels sont apparus lors de cette phase,

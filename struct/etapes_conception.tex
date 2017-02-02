@@ -12,8 +12,8 @@ faits à propos de leur architecture.
 Le programme de référence implémente le même réseau de neurones que notre IP
 mais directement en C. On peut ainsi l'executer sur un PC ou un micro-processeur 
 et comparer les résultats avec l'implémentation réelle sur FPGA. On comparera
-la valeur des résultats de sortie et le temps d'exécution entre software et
-hardware.
+la valeur des résultats de sortie et le temps d'exécution entre logiciel et
+matériel.
 
 \subsubsection{L'algorithme}
 
@@ -76,7 +76,7 @@ le rôle de la fonction \texttt{cut} qui permet de passer de 64 à 32 bits tout
 en conservant le signe.
 Notre IP garde uniquement les 32 bits de poids faible de ce mot de 64 bits,
 cependant des essais en software pour 100 et 200 neurones ont permis de découvrir
-des meilleurs masques qui augmentaient le taux de succès jusqu'à $0.5\%$
+des meilleurs masques qui augmentaient le taux de succès jusqu'à $0,5\%$
 (table
 \ref{fig:masques} page~\pageref{fig:masques}).
 
@@ -85,12 +85,12 @@ des meilleurs masques qui augmentaient le taux de succès jusqu'à $0.5\%$
 	\begin{tabular}{| l | l | l |}
 	\hline
 	Masque & Taux de succès (100 neurones) & Taux de succès (200 neurones)\\ \hline
-	\texttt{0x00000000FFFFFFFF} & 93.8 & 94.4 \\ \hline
-	\texttt{0x00000007FFFFFFF8} & 93.9 & 94.5 \\ \hline
-	\texttt{0x0000000FFFFFFFF0} & 93.9 & 94.7 \\ \hline
-	\texttt{0x0000001FFFFFFFE0} & 94.3 & 94.8 \\ \hline
-	\texttt{0x0000003FFFFFFFC0} & 79.4 & 89.4 \\ \hline
-	\texttt{0x000000FFFFFFFF00} & 8.5  & 8.5  \\ \hline
+	\texttt{0x00000000FFFFFFFF} & 93,8 & 94,4 \\ \hline
+	\texttt{0x00000007FFFFFFF8} & 93,9 & 94,5 \\ \hline
+	\texttt{0x0000000FFFFFFFF0} & 93,9 & 94,7 \\ \hline
+	\texttt{0x0000001FFFFFFFE0} & 94,3 & 94,8 \\ \hline
+	\texttt{0x0000003FFFFFFFC0} & 79,4 & 89,4 \\ \hline
+	\texttt{0x000000FFFFFFFF00} & 8,5  & 8,5  \\ \hline
 	\end{tabular}
 	\caption{Essais de différents masques et leur taux d'erreur}
 	\label{fig:masques}
@@ -116,7 +116,7 @@ Concernant les images, nous les avons récupérées à partir du site
 officiel MNIST \linebreak (\texttt{yann.lecun.com/exdb/mnist/}) sous forme de fichiers
 binaires où 1000 images de taille $28 \times 28$ pixels sont représentées comme
 des tableaux d'octets en C. Un autre fichier binaire nous permet de connaître
-le résultat, c'est-à-dire le digit, de chacune de ces images afin de comparer le
+le résultat, c'est-à-dire le chiffre, de chacune de ces images afin de comparer le
 résultat de notre réseau de neurones avec le résultat attendu.
 Les fonctions \texttt{get\_pixel} et \texttt{get\_label} permettent d'obtenir
 facilement ces informations depuis le logiciel.
@@ -142,7 +142,7 @@ mais un calcul beaucoup plus rapide de toutes les images.
 \end{figure}
 
 \subsubsection{Le neurone}
-	Le neurones est l'élément de base de notre réseau.
+	Le neurone est l'élément de base de notre réseau.
 	C'est donc la première chose que nous avons implémenté.
 	Pour faire cela, nous avons pensé le neurone en terme de
 	fonctionnalités uniquement.
@@ -153,8 +153,8 @@ mais un calcul beaucoup plus rapide de toutes les images.
 
 	\paragraph{Le mode de chargement des poids\\}
 
-	Pour permettre aux neurones d'accomplir leur rôle principale, il faut que chaque neurone ait
-	accès à ses poids. Etant donné que chaque neurone doit disposer de ses propres poids
+	Pour permettre aux neurones d'accomplir leur rôle principal, il faut que chaque neurone ait
+	accès à ses poids. \'{E}tant donné que chaque neurone doit disposer de ses propres poids
 	(identiques pour une application donnée et donc pour une grandes quantité d'images)
 	il est donc préférable que chaque neurone les mémorise. Afin d'accomplir cela,
 	les neurones reçoivent une adresse (numero du poids à mémoriser) ainsi qu'un poids.
@@ -184,7 +184,7 @@ mais un calcul beaucoup plus rapide de toutes les images.
 
 	Le mode de calcul est le mode principal d'un neurone. C'est dans ce mode que le neurone
 	reçoit des données et qu'il effectue une succession de multiplications à accumulations entre
-	la valeur du pixel reçu et le poids correspondant à l'adresse qui lui est donné. L'opération clé
+	la valeur du pixel reçu et le poids correspondant à l'adresse qui lui est donnée. L'opération clé
 	d'un neurone peut être écrite comme :
 	$$\sum_{adr=0}^n p_{adr}*d$$
 	avec $n$ données entrantes dans le réseau, $p_{adr}$ le poids à l'adresse $adr$
@@ -194,14 +194,14 @@ mais un calcul beaucoup plus rapide de toutes les images.
 	est capable de produire un résultat par image. Les neurones des niveaux suivant ne reçoivent
 	pas des pixels mais les résultats du niveaux précédent et opère de la même façon pour enfin
 	produire chacun un résultat (voir figure~\ref{fig:N_calcul} page~\pageref{fig:N_calcul}).
-	\\{\em Notez qu'entre deux niveaux les résultats passent par l'étage de recode
+	\\{\em Notez qu'entre deux niveaux les résultats passent par l'étage de recodage
 	(cf. Partie~\ref{plan:recode} "L'étage de recodage")}.
 
 	Une fois que chaque neurone a produit son résultat, ils vont en faire une copie dans
 	un registre appelé {\em miroir} et remettre le registre d'accumulation à 0. Ainsi,
-	le calcul de l'image suivante pourra être commencé alors que résultat de l'image précédente
+	le calcul de l'image suivante pourra être commencé alors que le résultat de l'image précédente
 	sera évacué vers la FIFO de sortie suivante. Pour ce faire, à la réception du signal
-	{\em sauver accu dans miroir}, chaque neurone va faire passer la valeur de son
+	\texttt{sauver\_accu\_dans\_miroir}, chaque neurone va faire passer la valeur de son
 	registre miroir au neurone suivant et récupérer la valeur du neurone précédent.
 	Cela permet de ne connecter qu'un neurone à la FIFO
 	et de faire évacuer les données les unes après les autres dans la FIFO
@@ -212,7 +212,7 @@ mais un calcul beaucoup plus rapide de toutes les images.
 La machine à états ou FSM (Finite State Machine) contrôle l'ensemble des neurones
 d'un niveau de neurones.
 Elle a été conçue de façon à contrôler un nombre de neurones indéfini : qu'il y
-ait 1 ou 100000 de neurones, la machine à états reste la même.
+ait 1 ou 100000 neurones, la machine à états reste la même.
 
 Les signaux de contrôle de la FSM sont reliés à tous les neurones.
 
@@ -244,32 +244,32 @@ neurones.
 
 Voici de courtes explications pour les différents états:
 \begin{itemize}
-	\item \verb+RESET_STATE+: état de reset
+	\item \verb+RESET_STATE+: état de reset~;
 	\item \verb+FSM_MODE+: choix du mode de fonctionnement du niveau de
-		neurones, soit chargement des poids, soit accumulation.
+		neurones, soit chargement des poids, soit accumulation~;
 	\item \verb+MODE_ACC+: on est en mode accumulation, on le signale aux
-		neurones, et on attend qu'ils aient pris en compte le changement.
+		neurones, et on attend qu'ils aient pris en compte le changement~;
 	\item \verb+WAIT_1D+: on attend que la première donnée soit présente
-		dans la FIFO d'entrée pour commencer l'accumulation.
+		dans la FIFO d'entrée pour commencer l'accumulation~;
 	\item \verb+SEND_DATA+: accumulation des neurones. Si jamais on a atteint
 		la fin d'une image on le notifie à la machine à états de la
-		chaîne de miroir, sinon on attend une nouvelle donnée.
-	\item \verb+WAIT_DATA+: on attend une nouvelle donnée
+		chaîne de miroir, sinon on attend une nouvelle donnée~;
+	\item \verb+WAIT_DATA+: on attend une nouvelle donnée~;
 	\item \verb+END_ACC+: on a fini l'accumulation sur une image, on retourne
-		dans l'état de choix de mode de la FSM.
+		dans l'état de choix de mode de la FSM~;
 	\item \verb+MODE_WEIGHT+: on est en mode chargement des poids, on le signale aux
-		neurones, et on attend qu'ils aient pris en compte le changement.
+		neurones, et on attend qu'ils aient pris en compte le changement~;
 	\item \verb+NOTIFY_1N+: on passe le token de configuration au premier neurone
-		et on attend qu'il nous confirme sa réception.
+		et on attend qu'il nous confirme sa réception~;
 	\item \verb+SEND_WEIGHT+: chargement du poids dans la mémoire du neurone.
 		Si jamais on a atteint la fin d'un neurone, on décale le token
-		de configuration, sinon on attend un nouveau poids.
-	\item \verb+WAIT_WEIGHT+: on attend un nouveau poids.
-	\item \verb+SHIFT_NOTIFY+: on décale le token de configuration.
+		de configuration, sinon on attend un nouveau poids~;
+	\item \verb+WAIT_WEIGHT+: on attend un nouveau poids~;
+	\item \verb+SHIFT_NOTIFY+: on décale le token de configuration~;
 	\item \verb+WAIT_NOTIFY+: on attend que les neurones aient bien décalé
 		le token de configuration, si jamais la FSM le reçoit cela signifie
 		que l'on a configuré tous les neurones, dans ce cas on passe en
-		fin de configuration, sinon on continue de configurer les neurones suivants.
+		fin de configuration, sinon on continue de configurer les neurones suivants~;
 	\item \verb+END_CONFIG+: on a fini le chargement des poids, on retourne
 		dans l'état de choix de mode de la FSM.
 \end{itemize}
@@ -292,14 +292,14 @@ Voici de courtes explications pour les différents états:
 \begin{itemize}
 	\item \verb+SHIFT_MODE+: état d'attente, si la FSM de contrôle des neurones
 		passe le drapeau de communication à 1, il faut commencer à décaler
-		la chaîne de miroir.
+		la chaîne de miroir~;
 	\item \verb+SHIFT_CPY+: copie de la valeur des registres d'accumulation
-		de chaque neurone dans leur miroir respectif.
+		de chaque neurone dans leur miroir respectif~;
 	\item \verb+WAIT_SHIFT_CPY+: on attend que les neurones aient copiés leur
-		registre dans le miroir.
+		registre dans le miroir~;
 	\item \verb+SHIFT+: on décale les miroirs de chaque neurone dans le neurone suivant
 		uniquement s'il y a suffisamment de place dans la FIFO de sortie. On prend en compte
-		le temps de propagation des signaux de contrôle pour qu'il n'y ait pas de donnée perdues
+		le temps de propagation des signaux de contrôle pour qu'il n'y ait pas de données perdues
 		à cause d'un manque de place dans la FIFO de sortie.
 \end{itemize}
 
@@ -312,7 +312,7 @@ machine à états afin de les contrôler. \\
 Afin de pouvoir relier les signaux de contrôle de la machine à états à plus de
 100 ou 200 neurones, de simples fils auraient posés
 problème. En effet, pour deux neurones très éloignés dans le FPGA, les temps
-de propagation des données envoyées en même temps de la FSM n'auraient pas été
+de propagation des données envoyées au même moment de la FSM n'auraient pas été
 identiques et cela aurait créé des problèmes de synchronisation. Pour cela, nous
 avons utilisé des buffers de distribution, déjà disponible, pour distribuer les
 signaux de contrôle de la FSM à tous les neurones ou les données d'entrée aux neurones. 
@@ -326,12 +326,12 @@ Certains signaux se connectent uniquement au premier ou au dernier des neurones
 et d'autres entre deux neurones consécutifs, ces connexions sont alors réalisées avec de simples fils. 
 Pour gérer ces connexions on instancie tous les neurones grâce à la boucle VHDL :\\
 \texttt{gen\_neu: for i in 0 to NBNEU-1 generate} \\
-où chacun des ports des neurones sont reliés à des tableaux de signaux pour
+où chacun des ports des neurones est relié à une case d'un tableau de signaux pour
 faciliter leur utilisation.
 
 \begin{figure}[h!]
 	\includegraphics[width=\textwidth]{nnlayer}
-	\caption{Schema d'un niveau de recode montrant les différents type 
+	\caption{Schéma d'un niveau de recode montrant les différents type 
 	d'interconnexion entre les différents éléments le constituant}
 	\label{fig:nnlayer}
 \end{figure}
@@ -360,13 +360,13 @@ Voici de courtes explications pour les différents états:
 		disponible dans la FIFO d'entrée, on passe dans l'état de traitement
 		des données. Si il s'agit du mode de chargement des poids
 		et qu'il y a un poids disponible dans la FIFO d'entrée, on passe dans l'état
-		de chargement des poids.
+		de chargement des poids~;
 	\item \verb+WRITE_INPUT+: on écrit le poids dans la mémoire,
 		si on a atteint la fin de la mémoire, on repasse dans l'état \verb+RESET+,
 		s'il y a une donnée
-		disponible ensuite on continue d'écrire les poinds dans la mémoire,
-		sinon on attend qu'il y ait un poids disponible.
-	\item \verb+WRITE_WAIT+: on attend qu'il y ait un poids disponible.
+		disponible ensuite on continue d'écrire les poids dans la mémoire,
+		sinon on attend qu'il y ait un poids disponible~;
+	\item \verb+WRITE_WAIT+: on attend qu'il y ait un poids disponible~;
 	\item \verb+DATA+: on effectue le traitement de la donnée en entrée seulement si:
 		elle est disponible, il y a de place dans la FIFO de sortie et on n'a pas atteint
 		la fin de la totalité des données sortant d'un décalage complet de la chaîne
@@ -380,16 +380,16 @@ Voici de courtes explications pour les différents états:
 \end{itemize}
 
 \subsubsection{Le pipeline complet}
-Une fois chaque éléments ci-dessus créé, il a fallut les mettre ensemble pour accomplir 
+Une fois chaque élément ci-dessus créé, il a fallu les mettre ensemble pour accomplir 
 le fonctionnement global du réseau. Il est important de réfléchir à la façon dont ces différents éléments 
-échangent leurs données. En effet, les différents organes du réseaux ne doivent pas calculer la même 
-quantité de donnée, donc le temps de traitement d'une image n'est pas identique dans tout le réseau. 
+échangent leurs données. En effet, les différents organes du réseau ne doivent pas calculer la même 
+quantité de données, donc le temps de traitement d'une image n'est pas identique dans tout le réseau. 
 C'est pourquoi, entre chaque élément du réseau (entrée, niveau de neurone 1, recodage, niveau 2, sortie) 
 nous avons utilisé des FIFOs. Les FIFOs utilisées nous ont été fournies, elles ont une entrée et une sortie sur 32 bits, 
 64 cases mémoire de 32 bits, 4 signaux de contrôle et 2 signaux donnant le nombre de places disponibles et occupées. 
 Deux des signaux de contrôle permettent à la FIFO d'avertir l'élément suivant qu'une donnée peut être sortie de la FIFO 
-et à l'élément précédent  q'une donnée peut être écrite. Les deux autres signaux de contrôle permettent eux aux élément 
-d'avertir la FIFO qu'une donnée est lue ou écrite (c'est un signal acquittement). 
+et à l'élément précédent  qu'une donnée peut être écrite. Les deux autres signaux de contrôle permettent aux éléments
+d'avertir la FIFO qu'une donnée est lue ou écrite (c'est un signal d'acquittement). 
 L'utilisation des FIFOs du réseau est différente dans les deux modes du réseau.
 	\paragraph{Le pipeline en mode chargement des poids}
 	Lorsque le réseau de neurones est en mode configuration, chaque élément va récupérer les constantes dans la 
@@ -406,7 +406,7 @@ L'utilisation des FIFOs du réseau est différente dans les deux modes du résea
 	
 	\paragraph{Le pipeline en mode calcul}
 	Lorsque le réseau de neurones est en mode de calcul, les images arrivent pixel par pixel dans la première FIFO. 
-	Chaque neurone produit 1 donnée qu'ils envoient une à une dans la FIFO n°2, le recodage traite alors ces 
+	Chaque neurone produit 1 donnée qu'il envoie une à une dans la FIFO n°2, le recodage traite alors ces 
 	données une à une et enfin l'étage 2 reçoit ces résultats en lisant dans la FIFO n°3. La dernière FIFO 
 	permet de stocker les données de sortie du réseau afin de les envoyer (par paquets de 16) au micro-processeur. 
 	(voir figure~\ref{fig:pipeline_data} page~\pageref{fig:pipeline_data}).
@@ -417,7 +417,7 @@ L'utilisation des FIFOs du réseau est différente dans les deux modes du résea
 	\end{figure}
 
 \subsection{Logiciel de commande}
-Le logiciel de commande est le logiciel embarqué sur la carte, qui s'execute
+Le logiciel de commande est le logiciel embarqué sur la carte, qui s'exécute
 sur processeur ARM. Celui ci permet de configurer notre réseau de neurones avec
 les poids et les constantes choisies, de lancer les calculs avec les valeurs
 voulues et de récupérer les résultats. Il s'écrit en C et s'interface avec
@@ -430,7 +430,7 @@ image, nombre de neurones à chaque niveau, nombre d'images) étaient toutes not
 dans un fichier (\texttt{dataset.h}). Nous avons gardé ce fonctionnement pour la
 majeure partie de notre projet car il nous a permis de tester facilement notre
 IP pour des images de petites tailles, des niveaux de neurones avec très peu
-de neurones (3) et de configurer facilement les pixels des images et les poids
+de neurones  (par exemple 4 dans le premier niveau et 3 dans le deuxième) et de configurer facilement les pixels des images et les poids
 choisis pour connaître les résultats attendus et comparer avec ceux de notre IP.
 Nous avons cependant complété ce code afin qu'il puisse gérer notre IP complète
 avec deux niveaux de neurones et un étage de recodage.
@@ -442,7 +442,7 @@ Pour pouvoir échanger des données entre le logiciel embarqué et notre IP, 16
 registres de 32 bits peuvent être lus et écrits des deux côtés de notre
 système. Par exemple
 les 4 premiers bits du registre 3 contiennent la configuration actuelle de notre
-IP : mode envoi des images, mode configuration (cad chargement des poids) du
+IP : mode envoi des images, mode configuration (c'est-à-dire chargement des poids) du
 niveau 1, 2 ou de l'étage de recodage. Cette configuration est transmise
 aux blocs concernés afin qu'ils changent leur comportement et attendent les
 données utiles en entrée. Un autre bit de ce registre permet d'envoyer le
@@ -462,13 +462,13 @@ faites :
 \begin{itemize}
 	\item si c'est une écriture, les données à écrire sont présentes, comme
 		variables globales, dans des tableaux multi-dimensions dans un
-		fichier C
+		fichier C~;
 	\item on alloue un tableau d'entiers (signé pour les poids, non signé
 		pour les frames) de 32 bits de manière dynamique. La taille
 		du tableau alloué dépend des données considérées mais on alloue
 		32 bits (1 case du tableau) par donnée (1 poids, 1 constante ou
 		1 pixel d'une frame) afin de faciliter leur traitement par l'IP,
-		les FIFOs ayant des cases de même taille.
+		les FIFOs ayant des cases de même taille~;
 	\item afin de préparer ce tableau aux bursts, qui sont des transferts
 		par bloc
 		de 16 mots de 32 bits, soit 16 cases du tableau vers une FIFO,
@@ -480,10 +480,10 @@ faites :
 		\texttt{0x00}, \texttt{0x40}, \texttt{0x80} ou \texttt{0xC0}.
 		Grâce au supplément dans la taille ajouté, on est sûr d'avoir
 		suffisament de place pour écrire les données même après avoir
-		incrémenté l'adresse pour l'arrondir.
+		incrémenté l'adresse pour l'arrondir~;
 	\item on écrit les données dans le tableau alloué à partir des
-		variables globales déjà présentes
-	\item on passe l'adresse de ce tableau à l'IP par un registre
+		variables globales déjà présentes~;
+	\item on passe l'adresse de ce tableau à l'IP par un registre~;
 	\item on indique dans un autre registre le nombre de bursts nécessaires
 		pour transférer tout le tableau vers la FIFO. Si le tableau n'a
 		pas un nombre de case qui est multiple de 16, on fait un burst
@@ -511,10 +511,10 @@ certains problèmes comme des boucles d'attente infinies, des données de
 notre IP sont écrites dans des registres comme les signaux \texttt{READY} et
 \texttt{ACK} de chacunes des FIFOs et les \texttt{COUNT} pour ces FIFOs. Des
 fonctions utilitaires permettent de lire facilement ces informations à partir
-des registres concernés et de nous renseigner plus précisément sur quel est
+des registres concernés et de nous renseigner plus précisément sur
 l'étage bloquant de notre système. \\
 % fonctions pour poper des valeurs en cours de route
-Cependant ces méthodes ne peuvent nous renseigner uniquement sur l'étage qui
+Cependant ces méthodes peuvent nous renseigner uniquement sur l'étage qui
 fait bloquer tout le système et non pas sur la validité des données produites
 en sortie de chaque étage. Une fonctionnalité pour sortir des données de chacune
 des FIFOs intermédiaires a alors été implémentée du côté hardware, active à la
@@ -539,9 +539,9 @@ $2\times N_1$ cycles (où $N_1$ est le nombre de neurones dans le premier niveau
 neurones).
 
 De plus, pour décaler les données du premier niveau jusqu'au deuxième
-niveau, il faut N1 cycles pour décaler les données dans la FIFO, puis trois cycles
+niveau, il faut $N_1$ cycles pour décaler les données dans la FIFO, puis trois cycles
 pour que la première donnée traverse les FIFOs et l'étage de recodage, les données
-qui suivront n'auront pas de latence. Ainsi Entre le premier niveau de neurones
+qui suivront n'auront pas de latence. Ainsi entre le premier niveau de neurones
 et le deuxième, il y a $N_1 + 3$ cycles.
 Mais le deuxième niveau de neurones va être bloquant (car $2\times N_1 > N_1 +3$
 pour $N_1 > 2$). Donc pour que les données soient décalées du premier
@@ -557,28 +557,28 @@ Ainsi le nombre de cycles requis pour traiter une image est:
 
 Donc le temps de calcul d'une image est:
 \begin{equation}
-	T_{calcul} = N_{calcul}/f_{réseau\_de\_neurones}
+	T_{calcul\_optimal} = \frac{N_{calcul}}{f_{réseau\_de\_neurones}}
 \end{equation}
 
 Néanmoins, si nous avions optimisé la machine à états de contrôle des neurones pour
 qu'elle prenne les données en entrée en un cycle au lieu de 2, il est possible
 d'obtenir :
 \begin{equation}
-	N_{calcul\_optimal} = N_1 \times 2 + FSIZE \times 2 + N_2
+	N_{calcul\_optimal} = N_1 + FSIZE + N_2
 \end{equation}
 
 Et
 \begin{equation}
-	T_{calcul\_optimal} = N_{calcul}/f_{réseau\_de\_neurones}
+	T_{calcul\_optimal} = \frac{N_{calcul}}{f_{réseau\_de\_neurones}}
 \end{equation}
 
 Malheureusement, nous avons manqué de temps pour optimiser cette machine à états
 et valider que l'IP fonctionnait encore après optimisation.
 
-\subsubsection{Implantation sur carte Zedboard}
+\subsubsection{Implantation sur carte ZedBoard}
 
-Avec l'outil {\em Xilinx Vivado}, nous avons implanté sur la carte Zedboard notre IP.
-La Zedboard dispose de 220 cellules DSP (utilisées pour l'accumulation dans les neurones).
+Avec l'outil {\em Xilinx Vivado}, nous avons implanté sur la carte ZedBoard notre IP.
+La ZedBoard dispose de 220 cellules DSP (utilisées pour l'accumulation dans les neurones).
 
 Après implantation de l'IP pour 100 neurones dans le premier niveau et 10 dans le deuxième,
 à une fréquence de 115 MHz, nous obtenons, les caractéristiques suivantes :
@@ -610,11 +610,11 @@ Dans ce cas-là, le facteur d'accélération vaut $t_{logiciel}/t_{IP (pratique)
 	\centering
 	\begin{tabular}{| p{0.15\textwidth} | p{0.10\textwidth} | p{0.2\textwidth} | p{0.2\textwidth} | p{0.15\textwidth} |}
 		\hline
-		Entité & fréquence (MHz) & Taux de réussite pour 1000 images (MNIST) & Temps de calcul pour 1000 images (secondes) & nombre d'images par secondes\\
+		Entité & Fréquence (MHz) & Taux de réussite pour 1000 images (MNIST) & Temps de calcul pour 1000 images (secondes) & Nombre d'images par secondes\\
 		\hline
-		Logiciel de référence & 667 & 93.80\% &  8.67455 & 115.28\\
-		IP (Théorie) & 115 &  93.80\% & 0.0154608 & 64679.4\\
-		IP (Pratique) & 115 &  93.80\% & 0.0189669 & 52726.3\\
+		Logiciel de référence & 667 & 93,80\% &  8,67455 & 115,28\\
+		IP (Théorie) & 115 &  93,80\% & 0,0154608 & 64679,4\\
+		IP (Pratique) & 115 &  93,80\% & 0,0189669 & 52726,3\\
 		\hline
 	\end{tabular}
 	\caption{Performances pour $FSIZE = 784$, $N_1 = 100$ et $N_2 = 10$}

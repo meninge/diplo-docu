@@ -31,9 +31,9 @@ Il est visible sur la figure~\ref{fig:PlanningReel} page~\pageref{fig:PlanningRe
 		\gantttitle{Projet}{20} \\
 		\gantttitle{Oct}{4}
 		\gantttitle{Nov}{4}
-		\gantttitle{Dec}{4}
+		\gantttitle{Déc}{4}
 		\gantttitle{Jan}{4}
-		\gantttitle{Feb}{4}
+		\gantttitle{Fév}{4}
 		\ganttnewline
 
 		%tasks
@@ -50,7 +50,7 @@ Il est visible sur la figure~\ref{fig:PlanningReel} page~\pageref{fig:PlanningRe
 		%5
 		\ganttbar{Validation sur carte}{12}{15} \\
 		%6
-		\ganttbar{Evaluation des performances}{16}{17} \\
+		\ganttbar{\'{E}valuation des performances}{16}{17} \\
 		%7
 		\ganttbar{Documentation}{14}{17} \\
 		%8
@@ -90,9 +90,9 @@ Il est visible sur la figure~\ref{fig:PlanningReel} page~\pageref{fig:PlanningRe
 		\gantttitle{Projet}{20} \\
 		\gantttitle{Oct}{4}
 		\gantttitle{Nov}{4}
-		\gantttitle{Dec}{4}
+		\gantttitle{Déc}{4}
 		\gantttitle{Jan}{4}
-		\gantttitle{Feb}{4}
+		\gantttitle{Fév}{4}
 		\ganttnewline
 
 		%tasks
@@ -109,7 +109,7 @@ Il est visible sur la figure~\ref{fig:PlanningReel} page~\pageref{fig:PlanningRe
 		%5
 		\ganttbar{Validation sur carte}{12}{16} \\
 		%6
-		\ganttbar{Evaluation des performances}{17}{17} \\
+		\ganttbar{\'{E}valuation des performances}{17}{17} \\
 		%7
 		\ganttbar{Documentation}{12}{17} \\
 		%8
@@ -130,28 +130,28 @@ Il est visible sur la figure~\ref{fig:PlanningReel} page~\pageref{fig:PlanningRe
 Voici la description des différentes tâches:
 \begin{itemize}
 	\item \textbf{Spécifications}: écrire les spécifications du
-		réseau de neurones sur FPGA, définir son architecture.
+		réseau de neurones sur FPGA, définir son architecture~;
 	\item \textbf{Programme de référence}: écriture du programme en C
 		permettant de comparer les résultats de notre IP à une version
-		logicielle. Il permettra aussi lors de l'évaluation de
-		performances pour mesurer le facteur d'accélération de notre IP.
+		logicielle. Il servira aussi lors de l'évaluation de
+		performances pour mesurer le facteur d'accélération de notre IP~;
 	\item \textbf{Implantation de l'IP}: écriture en VHDL des différents
-		composants de l'IP.
+		composants de l'IP~;
 	\item \textbf{Validation en simulation}: Test benches pour vérifier le
 		comportement de nos composants, leurs interactions et le
-		fonctionnement global de l'IP.
+		fonctionnement global de l'IP~;
 	\item \textbf{Validation sur carte}: Tests sur carte permettant de
 		vérifier le comportement de notre IP sur carte Zybo,
-		puis Zedboard.
+		puis ZedBoard~;
 	\item \textbf{Logiciel de commande}: écriture du logiciel permettant de
-		contrôler l'IP.
+		contrôler l'IP~;
 	\item \textbf{Evaluation des performances}: comparaison de performances
 		de notre IP par rapport au logiciel de référence fonctionnant
-		sur la même carte.
+		sur la même carte~;
 	\item \textbf{Documentation}: écriture de la documentation comprenant
 		le cahier des charges, le planning, le manuel utilisateur,
 		les étapes de conception, la validation et la présentation de la
-		démonstration.
+		démonstration~;
 	\item \textbf{Soutenance}: Soutenance finale incluant une démonstration
 		du travail effectué.
 \end{itemize}
@@ -164,12 +164,12 @@ entre les membres du groupe.
 
 Voici les occupations principales de chaque personne:
 \begin{itemize}
-	\item Hugues : \'{E}criture du programme de référence et du logiciel de
-		commande, implantation de l'IP, documentation
-	\item Lucas : Spécifications, implantation de l'IP, validation sur
-		carte, documentation
-	\item Paul : Spécifications, implantation de l'IP, validation en
-		simulation, documentation
+	\item Hugues : écriture du programme de référence et du logiciel de
+		commande, implantation de l'IP, documentation~;
+	\item Lucas : spécifications, implantation de l'IP, validation sur
+		carte, documentation~;
+	\item Paul : spécifications, implantation de l'IP, validation en
+		simulation, documentation.
 \end{itemize}
 ~\\
 Cependant, certains problèmes majeurs dans l'implantation de l'IP et les essais
@@ -179,21 +179,22 @@ problèmes rencontrés.
 
 \subsection{Problèmes rencontrés}
 
-Parmi les quelques problèmes rencontrés, l'utilisation de vivado nous a fait perdre beaucoup de temps. 
-En effet, bien que ce logiciel de conception est puissant et complet, il a certain comportement assez étrange. 
+Parmi les quelques problèmes rencontrés, l'utilisation de {\em Vivado} nous a fait perdre beaucoup de temps. 
+En effet, bien que ce logiciel de conception soit puissant et complet, il a certains comportements assez étranges. 
 Nous citerons par exemple, la démarche à mettre en oeuvre pour que le logiciel prenne 
-effectivement en compte les modifications des fichiers sources (prêt de 10 clics et environ 2 minutes). 
-Un autre exemple, qui nous a fait perdre prêt d'une demi-journée, est le fait que le logiciel décide (sans prévenir) 
+effectivement en compte les modifications des fichiers sources (près de 10 clics et environ 2 minutes). 
+Un autre exemple, qui nous a fait perdre près d'une demi-journée, est le fait que le logiciel décide (sans prévenir) 
 qu'il génère le bitstream dans un nouveau fichier sans prévenir le SDK qui, lui, envoie toujours l'ancien bitstream. 
 Un dernier cas nous a posé problème, ainsi qu'à nos tuteurs, et le passage du projet d'un carte à l'autre. 
 Pour réussir à faire cela, nous avons du recréer le projet en partant de zéro.\\
 
-Outre ces nombreux problème dû aux outils de conception, nous nous sommes confronté à un autre problème inattendu. 
+Outre ces nombreux problèmes dûs aux outils de conception, nous nous sommes
+confrontés à un autre problème inattendu. 
 En effet, nous avions prévu de passer beaucoup moins de temps sur la partie de validation sur 
 carte et plus de temps sur la validation en simulation. Nous pensions que si l'IP fonctionnait en simulation, 
 elle aurait le même comportement après synthèse et sur le FPGA. 
-Or, dans plusieurs endroits de notre IP, l'outil de synthèse instanciait des latchs à la place de registres. 
-A cause de cela, le fonctionnement n'était pas celui attendu, et nous avons du repasser du temps pour déboguer l'IP.
+Or, à plusieurs endroits de notre IP, l'outil de synthèse instanciait des latchs à la place de registres. 
+A cause de cela, le fonctionnement n'était pas celui attendu, et nous avons dû repasser du temps pour déboguer l'IP.
 
 
 

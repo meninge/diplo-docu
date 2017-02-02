@@ -27,8 +27,8 @@ TIMA à un réseau de neurones plus classique, tous deux réalisés sur le même
 matériel.
 
 Un objectif secondaire serait de comparer le composant réalisé à d'autres
-produits similaires tels que la puce neuromorphique Spinnaker de l'université
-de Manchester, ou bien la puce TrueNorth d'IBM.
+produits similaires tels que la puce neuromorphique {\em SpiNNaker}\cite{painkras2013spinnaker} de l'université
+de Manchester, ou bien la puce {\em TrueNorth}\cite{modha2014introducing} d'IBM.
 
 \subsubsection{Contexte}
 
@@ -44,19 +44,19 @@ sur carte ZedBoard.
 
 \subsubsection{Énoncé du besoin}
 
-Les finalités du produit pour le futur utilisateur tel que prévu par le
+Les finalités du produit pour le futur utilisateur telles que prévues par le
 demandeur sont:
 \begin{itemize}
-	\item Il faut concevoir un logiciel de référence.
-		Celui ci doit respecter les caractéristiques du réseau de neurones demandé, et produire un résultat qui servira de référence à l'IP conçue.
-	\item Le composant matériel doit pouvoir être générique,
+	\item il faut concevoir un logiciel de référence.
+		Celui ci doit respecter les caractéristiques du réseau de neurones demandé, et produire un résultat qui servira de référence à l'IP conçue~;
+	\item le composant matériel doit pouvoir être générique,
 		c'est-à-dire qu'il doit être possible de changer le nombre de
-		neurones, les coefficients de chaque neurones
+		neurones, les coefficients de chaque neurone
 		ou encore la taille des données d'entrées,
-		sans la moindre adaptation de code (simplement en changeant les variables voulues dans un fichier).
-	\item Le composant matériel doit produire le résultat attendu, c'est-à-dire qu'il
-		doit produire un résultat identique au programme de référence.
-	\item Le produit étant fortement technique et devant être utilisé par des personnes n'ayant pas conçu cette IP, une documentation détaillée doit être fournie.
+		sans la moindre adaptation de code (simplement en changeant les variables voulues dans un fichier)~;
+	\item le composant matériel doit produire le résultat attendu, c'est-à-dire qu'il
+		doit produire un résultat identique au programme de référence~;
+	\item le produit étant fortement technique et devant être utilisé par des personnes n'ayant pas conçu cette IP, une documentation détaillée doit être fournie.
 \end{itemize}
 
 \subsection{Expression fonctionnelle du besoin}
@@ -74,7 +74,7 @@ Ainsi le but premier du réseau sera de trouver quel caractère lui a été donn
 \paragraph{Fonctions de service complémentaires\\}
 % (qui améliorent, facilitent ou complètent le service rendu)
 Pour une question d'évolution et de réutilisation du projet, le produit rendu doit être reconfigurable très rapidement.
-En modifiant seulement quelques variables, le produit doit être capable de s'adapter à d'autres applications que celle prévu pour ce projet.
+En modifiant seulement quelques variables, le produit doit être capable de s'adapter à d'autres applications que celle prévue pour ce projet.
 
 \paragraph{Contraintes\\}
 % (limitations à la liberté du concepteur-réalisateur)
@@ -88,17 +88,17 @@ d'un neurone. De plus, il devra utiliser des BRAM pour stocker les coefficients 
 \paragraph{Décomposition en modules, sous-ensembles\\}
 
 L'IP conçue s'intègre dans un environnement complexe.
-Dans une même puce, se trouvent un FPGA, deux coeurs ARM et de nombreuses autres IP tel qu'un DMA,
+Dans une même puce, se trouvent un FPGA, deux coeurs ARM et de nombreuses autres IP telles qu'un DMA,
 de la mémoire et un bus permettant de faire communiquer toutes ces IP entre elles.
-Le réseau de neurones est donc implanté dans le FPGA, et est composé dans l'ordre de propagation des données de :
+Le réseau de neurones est donc implanté dans le FPGA, et est composé dans l'ordre de propagation des données de~:
 
 \begin{itemize}
-	\item Une FIFO permettant de récupérer les données envoyées par le micro-processeur via le bus.
-	\item Un premier niveau de plus de cents neurones.
-	\item Chaque neurone produit un résultat stocké dans une deuxième FIFO.
-	\item Les données produites par le premier niveau de neurones passent par une fonction non linéaire.
-	\item Ces données ainsi traitées sont envoyées par une FIFO au deuxième et dernier étage de neurones comptant 10 neurones (1 par chiffre à prédire).
-	\item Les résultats finaux sont ainsi renvoyés vers le micro-processeur via le bus AXI de la puce.
+	\item une FIFO permettant de récupérer les données envoyées par le micro-processeur via le bus~;
+	\item un premier niveau de plus de cents neurones~;
+	\item chaque neurone produit un résultat stocké dans une deuxième FIFO~;
+	\item les données produites par le premier niveau de neurones passent par une fonction non linéaire~;
+	\item ces données ainsi traitées sont envoyées par une FIFO au deuxième et dernier étage de neurones comptant 10 neurones (1 par chiffre à prédire)~;
+	\item les résultats finaux sont ainsi renvoyés vers le micro-processeur via le bus AXI de la puce.
 \end{itemize}
 
 \begin{figure}[htbp]
@@ -114,11 +114,11 @@ Le réseau de neurones est donc implanté dans le FPGA, et est composé dans l'o
 
 Les critères permettant de mesurer la qualité du composant produit sont:
 \begin{itemize}
-	\item Correction du composant : le résultat doit être celui attendu.
-	\item Taux d'utilisation des cellules du FPGA
-	\item Performances du composant (fréquence, nombre de cycles pour
-		calculer le résultat ...)
-	\item Généricité du composant
+	\item correction du composant : le résultat doit être celui attendu~;
+	\item taux d'utilisation des cellules du FPGA~;
+	\item performances du composant (fréquence, nombre de cycles pour
+		calculer le résultat ...)~;
+	\item généricité du composant.
 \end{itemize}
 
 \subsubsection{Niveaux des critères d’appréciation}
@@ -128,8 +128,8 @@ Les critères permettant de mesurer la qualité du composant produit sont:
 
 Il est nécessaire que le composant satisfasse les niveaux de critères suivants:
 \begin{itemize}
-	\item Correction : le résultat doit être correct
-	\item Taux d'utilisation des cellules du FPGA : un neurone doit utiliser
+	\item correction : le résultat doit être correct~;
+	\item taux d'utilisation des cellules du FPGA : un neurone doit utiliser
 		une cellule DSP.
 \end{itemize}
 
@@ -137,9 +137,9 @@ Il est nécessaire que le composant satisfasse les niveaux de critères suivants
 
 Il est souhaitable que le composant satisfasse les niveaux de critères suivants:
 \begin{itemize}
-	\item Performances : Le résultat d'un calcul du composant doit être plus
-		rapide que son équivalent réalisé sur un processeur classique.
-	\item Généricité : Les fichiers HDL du composant doivent pouvoir être
+	\item performances : Le résultat d'un calcul du composant doit être plus
+		rapide que son équivalent réalisé sur un processeur classique~;
+	\item généricité : Les fichiers HDL du composant doivent pouvoir être
 		modifié de façon mineure pour changer les paramètres du réseau
 		de neurones.
 \end{itemize}

@@ -1,18 +1,18 @@
-De nos jours, les réseaux de neurones artificiels reprennent de plus en plus d'importance car la puissance de calculs disponible permet d'obtenir des résultats satisfaisants en temps raisonnable.
+De nos jours, les réseaux de neurones artificiels reprennent de plus en plus d'importance car la puissance de calcul disponible permet d'obtenir des résultats satisfaisants en temps raisonnable.
 Le traitement d'images, la reconnaissance vocale ou les traitements lexicaux sont
 des applications qui pourraient être intégrées dans des systèmes embarqués. Pour ce type d'application, il est possible
 d'implémenter sur des CPU ou GPU des algorithmes neuronaux, mais la consommation et la vitesse de traitement deviendraient vite limitants.
 
 Créer un composant électronique (ASIC ou une IP FPGA dans un premier temps) implémentant un réseau de neurones réduirait drastiquement sa consommation
 et améliorerait la vitesse du réseau par rapport à un CPU.
-De plus, étant donnée que l'IP serait spécialisée pour cette application et paramétrable dynamiquement,
+De plus, étant donné que l'IP serait spécialisée pour cette application et paramétrable dynamiquement,
 cela lui permettrait de s'adapter à de multiples applications en ayant des performances élevées.\\
 
 Le projet "Réseau de neurones sur FPGA" s'inscrit dans ce cadre. Sous le tutorat
 de Frédéric Pétrot et Adrien Prost-Boucle, nous devons créer un tel composant,
 et tester ses performances en vue de le comparer à des systèmes existants tels
-que la puce {\em SpiNNaker}\cite{painkras2013spinnaker} ou {\em TrueNorth}\cite{modha2014introducing} d'IBM ou encore de systèmes en développement
-tel que les réseaux de neurones ternaires du laboratoire TIMA. Une fois
-implémenté et validé, nous utiliserons une carte FPGA Zedboard pour tester notre
+que la puce {\em SpiNNaker}\cite{painkras2013spinnaker} ou {\em TrueNorth}\cite{modha2014introducing} d'IBM ou encore des systèmes en développement
+tels que les réseaux de neurones ternaires du laboratoire TIMA. Une fois
+implémenté et validé, nous utiliserons une carte FPGA ZedBoard pour tester notre
 composant sur une application classique de reconnaissance de chiffres manuscrits,
 en utilisant la base de données MNIST\cite{lecun2010mnist}.
