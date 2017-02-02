@@ -3,6 +3,8 @@ all: compile clean
 
 compile:
 	pdflatex main.tex
+	bibtex main.aux
+	pdflatex main.tex
 	pdflatex main.tex
 open:
 	open main.pdf
