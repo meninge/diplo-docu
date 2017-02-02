@@ -1,1 +1,17 @@
-A remplir
+\` {A} la fin de ce projet, nous disposons d'une IP réseau de neurones très performante (environ 450 fois plus rapide
+qu'un logiciel implémentant le même réseau de neurones). Celle-ci est générique~: il suffit de modifier quelques constantes
+dans un fichier VHDL et dans les fichiers sources du logiciel pour changer les paramètres du réseau de neurones (nombre de neurones
+de chaque niveau, taille des images d'entrée et nombre d'images). De même, il est configurable dynamiquement, sans avoir à
+générer à nouveau le bitstream~:
+il est possible via des appels de fonctions de changer la configuration de chaque niveau de neurones et de l'étage de recodage.
+
+Cependant, il est possible d'obtenir des performances encore meilleures (un facteur d'amélioration environ égal à 2) en optimisant la machine à
+états de contrôle de neurones. Malheureusement, nous n'avons pas eu le temps d'effectuer cette dernière et de la valider en simulation et sur carte
+dans le temps imparti. En effet, nous avons rencontré des problèmes innatendus qui nous ont fortement freiné dans notre progression.
+Néanmoins, nous avons réussi à remplir les objectifs du projet à temps en proposant une IP réseau de neurones générique, correcte,
+configurable dynamiquement et beaucoup plus performante que le logiciel.\\
+~\\
+L'IP développée durant ce projet pourra permettre au laboratoire TIMA de comparer les performances
+de leur réseau de neurones ternaires à un réseau de neurones plus classqiue sur un même matériel.
+De même, il serait intéressant de comparer les performances de notre réseau à des alternatives
+telles que {\em SpiNNaker\cite{painkras2013spinnaker}} de l'université de Manchester, ou bien {\em TrueNorth} d'IBM.
