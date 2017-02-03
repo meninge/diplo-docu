@@ -62,8 +62,8 @@
 % -- for scalable font
 \usepackage{lmodern}
 
-% -- for the nomenclature
-\usepackage{nomencl}
+% -- for the nomenclature in the TableOfContent
+\usepackage[intoc]{nomencl}
 \makenomenclature
 \renewcommand{\nomname}{List of Symbols}
 \pagestyle{fancy}
@@ -71,17 +71,19 @@
 % -- Document --
 
 \title{Implémentation d'un réseau de neurones sur FPGA}
-\author{Paul Luperini\\ Lucas Mahieu\\Hugues de Valon}
+\author{Paul Luperini\\ Lucas Mahieu\\Hugues de Valon\\   \\ encadré par\\ Frédéric PETROT\\ et\\ Adrien PROST-BOUCLE\\   \\   \\dans le cadre du Projet SLE 3A Ensimag 2016/2017}
 \begin{document}
 
 % -- Page de garde :
 \maketitle
 
-%\begin{figure}[h!]
-%    \centering
-%    %\includepdf[pages={1}]{data/FirstPage.pdf}
-%    \label{fig:first}
-%\end{figure}
+    \vspace{3cm}
+
+\begin{figure}[h!]
+    \centering
+		\includegraphics[scale=0.8]{pagegarde}
+    \label{fig:pagegarde}
+\end{figure}
 
 \pagebreak
 \tableofcontents
