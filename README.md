@@ -1,4 +1,4 @@
-# Diplo-docu 
+# diplo-docu 
 
 This repository contains documentation for meninge project.
 
