@@ -1,6 +1,7 @@
 # diplo-docu 
 
 This repository contains documentation for meninge project.
+Check in this project Wiki important documentation.
 
 This documentation is written in French, since our
 teachers asked for a documentation written in French.
